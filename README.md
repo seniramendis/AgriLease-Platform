@@ -2,19 +2,19 @@
 
 <p>AgriLease is a web-based "sharing economy" platform designed to bridge the agricultural mechanization gap in Sri Lanka[cite: 571, 572]. [cite_start]By connecting machine owners (Lessors) with smallholder farmers (Lessees) in regions like Anuradhapura, Polonnaruwa, and Ampara, the platform optimizes asset utilization and provides affordable access to modern agricultural technology.</p>
 
-[cite_start]This project digitizes the local "Custom Hiring" system, addressing unique logistical challenges, seasonal "Maha" and "Yala" pressures, and financial hurdles for Sri Lankan farmers[cite: 575, 604, 606].
+This project digitizes the local "Custom Hiring" system, addressing unique logistical challenges, seasonal "Maha" and "Yala" pressures, and financial hurdles for Sri Lankan farmers.
 
 ---
 
 <h2>🛠 Technology Stack</h2>
 
-[cite_start]This project utilizes a modern, zero-cost bootstrap "Agri-Tech" stack optimized for 2026[cite: 717, 726]:
+This project utilizes a modern, zero-cost bootstrap "Agri-Tech" stack optimized for 2026:
 
 ### Backend & Database
-* [cite_start]**Framework:** Laravel 10.x (PHP 8.2) [cite: 718, 744]
-* [cite_start]**Database:** PostgreSQL 15 [cite: 718, 744]
-* [cite_start]**Spatial Data:** PostGIS (for mapping irregular paddy fields and routing) [cite: 633, 634, 635, 744]
-* [cite_start]**Authentication:** Supabase Auth [cite: 641, 644, 744]
+* **Framework:** Laravel 10.x (PHP 8.2) [cite: 718, 744]
+* **Database:** PostgreSQL 15 [cite: 718, 744]
+* **Spatial Data:** PostGIS (for mapping irregular paddy fields and routing) [cite: 633, 634, 635, 744]
+* **Authentication:** Supabase Auth [cite: 641, 644, 744]
 
 ### Frontend & Mapping
 * [cite_start]**UI/UX:** HTML, CSS, JavaScript [cite: 744]
