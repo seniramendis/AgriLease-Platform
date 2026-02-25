@@ -1,0 +1,100 @@
+<!-- ========================================
+     AGRILEASE - FOOTER COMPONENT
+     ======================================== -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <div class="logo" style="color: white; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; font-size: 1.5rem;">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">agriculture</span>
+                AgriLease
+            </div>
+            <p style="max-width: 280px; line-height: 1.8;">
+                Bridging the gap between machinery owners and local farmers to boost Sri Lanka's agricultural productivity through modern technology.
+            </p>
+            <div style="display: flex; gap: 12px; margin-top: 2rem;">
+                <a href="#" class="footer-social"><span class="material-symbols-outlined">language</span></a>
+                <a href="#" class="footer-social"><span class="material-symbols-outlined">call</span></a>
+                <a href="#" class="footer-social"><span class="material-symbols-outlined">mail</span></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Platform</h4>
+            <ul>
+                <li><a href="#">How it Works</a></li>
+                <li><a href="/pages/farms.html">Browse Machines</a></li>
+                <li><a href="/pages/map.html">Map View</a></li>
+                <li><a href="/pages/crops.html">Crop Guide</a></li>
+                <li><a href="/pages/weather.html">Weather</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Opportunities</h4>
+            <ul>
+                <li><a href="#">Register as Lessor</a></li>
+                <li><a href="#">Join as Operator</a></li>
+                <li><a href="#">Service Providers</a></li>
+                <li><a href="#">Partner With Us</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">Safety & Trust</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+            </ul>
+            <h4 style="margin-top: 2rem;">Contact</h4>
+            <p style="color: #94a3b8;">Colombo, Sri Lanka</p>
+            <p style="color: #10b981; font-weight: 800; margin-top: 8px; font-size: 1.15rem;">+94 11 234 5678</p>
+            <p style="color: #94a3b8; margin-top: 6px; font-size: 0.9rem;">support@agrilease.lk</p>
+        </div>
+    </div>
+    <div class="copyright">
+        © 2026 AgriLease Sri Lanka. All Rights Reserved. Built with ❤️ for Sri Lankan Farmers.
+    </div>
+</footer>
+
+<style>
+footer {
+    background: #020617;
+    color: #94a3b8;
+    padding: 6rem 10% 2rem;
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+}
+.footer-col h4 {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+.footer-col ul li { margin-bottom: 0.85rem; }
+.footer-col a { color: #94a3b8; font-size: 0.95rem; display: inline-block; }
+.footer-col a:hover { color: white; transform: translateX(6px); }
+.footer-social {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #1e293b;
+    display: flex; align-items: center; justify-content: center;
+    color: #94a3b8;
+    transition: all 0.3s;
+}
+.footer-social:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+.copyright {
+    text-align: center;
+    padding-top: 2.5rem;
+    border-top: 1px solid #1e293b;
+    font-size: 0.875rem;
+    letter-spacing: 0.3px;
+    color: #64748b;
+}
+@media (max-width: 1024px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+</style>

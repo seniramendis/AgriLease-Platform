@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Reports & Analytics | AgriLease</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="../assets/css/theme.css"/>
+    <link rel="stylesheet" href="../assets/css/main.css"/>
+    <link rel="stylesheet" href="../assets/css/forms.css"/>
+    <style>
+        .chart-bar-container { display: flex; flex-direction: column; gap: 10px; }
+        .chart-bar-row { display: flex; align-items: center; gap: 14px; }
+        .chart-bar-label { width: 120px; font-size: 0.85rem; font-weight: 600; color: var(--text-mid); flex-shrink: 0; text-align: right; }
+        .chart-bar-track { flex: 1; height: 12px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+        .chart-bar-fill { height: 100%; border-radius: 99px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+        .chart-bar-value { width: 60px; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); flex-shrink: 0; }
+
+        .donut-segment { transition: all 0.4s; cursor: pointer; }
+        .donut-segment:hover { opacity: 0.85; filter: brightness(1.1); }
+
+        .activity-item { display: flex; align-items: flex-start; gap: 14px; padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+    </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="page-header">
+        <div>
+            <h1>Reports & Analytics</h1>
+            <p>Platform performance and rental insights</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <select class="form-control" style="width: auto; font-size: 0.875rem;">
+                <option>Last 30 days</option>
+                <option>Last 90 days</option>
+                <option>This Year</option>
+            </select>
+            <button class="btn btn-primary btn-sm">
+                <span class="material-symbols-outlined" style="font-size:1rem;">download</span>
+                Export
+            </button>
+        </div>
+    </div>
+
+    <div style="padding: 2.5rem 5%;">
+
+        <!-- Stats Row -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;" id="stats-grid">
+            <div class="stat-card">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+                    <span class="badge badge-primary">Machines</span>
+                    <div class="icon-circle"><span class="material-symbols-outlined">precision_manufacturing</span></div>
+                </div>
+                <div class="stat-value" id="stat-machines">—</div>
+                <div class="stat-label">Total Machines Listed</div>
+                <div class="stat-change up">↑ +12% from last month</div>
+            </div>
+            <div class="stat-card">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+                    <span class="badge badge-success">Operators</span>
+                    <div class="icon-circle"><span class="material-symbols-outlined">person_check</span></div>
+                </div>
+                <div class="stat-value" id="stat-operators">—</div>
+                <div class="stat-label">Certified Operators</div>
+                <div class="stat-change up">↑ +8% from last month</div>
+            </div>
+            <div class="stat-card">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+                    <span class="badge badge-warning">Rentals</span>
+                    <div class="icon-circle"><span class="material-symbols-outlined">event_available</span></div>
+                </div>
+                <div class="stat-value" id="stat-rentals">—</div>
+                <div class="stat-label">Active Rentals</div>
+                <div class="stat-change up">↑ +5% this week</div>
+            </div>
+            <div class="stat-card">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+                    <span class="badge badge-info">Revenue</span>
+                    <div class="icon-circle"><span class="material-symbols-outlined">payments</span></div>
+                </div>
+                <div class="stat-value" id="stat-revenue" style="font-size:1.8rem;">—</div>
+                <div class="stat-label">Monthly Revenue (LKR)</div>
+                <div class="stat-change up">↑ +18% from last month</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+
+            <!-- Rentals by District -->
+            <div class="card">
+                <div class="card-header">Rentals by District</div>
+                <div class="card-body">
+                    <div class="chart-bar-container" id="district-chart">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Machine Categories Donut -->
+            <div class="card">
+                <div class="card-header">Machine Categories</div>
+                <div class="card-body" style="display:flex; flex-direction:column; align-items:center;">
+                    <svg viewBox="0 0 200 200" width="180" height="180" id="donut-chart"></svg>
+                    <div id="donut-legend" style="margin-top:1rem; width:100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+
+            <!-- Recent Transactions -->
+            <div class="card">
+                <div class="card-header" style="display:flex; align-items:center; justify-content:space-between;">
+                    <span>Recent Transactions</span>
+                    <a href="#" style="font-size:0.8rem; color:var(--primary); font-weight:700;">View All</a>
+                </div>
+                <div class="card-body" style="padding-top:0;">
+                    <div id="transactions-list"></div>
+                </div>
+            </div>
+
+            <!-- Activity Feed -->
+            <div class="card">
+                <div class="card-header">Platform Activity</div>
+                <div class="card-body" style="padding-top:0;">
+                    <div id="activity-feed"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Load stats
+        let stats;
+        try { stats = (await AgriLease.API.getStats()).data; } catch {}
+        if (stats) {
+            document.getElementById('stat-machines').textContent = stats.totalMachines.toLocaleString();
+            document.getElementById('stat-operators').textContent = stats.totalOperators.toLocaleString();
+            document.getElementById('stat-rentals').textContent = stats.activeRentals.toLocaleString();
+            document.getElementById('stat-revenue').textContent = AgriLease.Format.currency(stats.monthlyRevenue);
+        }
+
+        // District bar chart
+        const districtData = [
+            { label: 'Kurunegala', value: 89, color: '#2d6c50' },
+            { label: 'Polonnaruwa', value: 74, color: '#3b82f6' },
+            { label: 'Colombo', value: 65, color: '#f59e0b' },
+            { label: 'Anuradhapura', value: 58, color: '#8b5cf6' },
+            { label: 'Kandy', value: 47, color: '#ec4899' },
+            { label: 'Galle', value: 38, color: '#14b8a6' },
+            { label: 'Ampara', value: 31, color: '#f97316' },
+        ];
+        const maxVal = Math.max(...districtData.map(d => d.value));
+        document.getElementById('district-chart').innerHTML = districtData.map(d => `
+            <div class="chart-bar-row">
+                <div class="chart-bar-label">${d.label}</div>
+                <div class="chart-bar-track">
+                    <div class="chart-bar-fill" style="width:${(d.value/maxVal*100)}%; background:${d.color};"></div>
+                </div>
+                <div class="chart-bar-value">${d.value}</div>
+            </div>`).join('');
+
+        // Donut chart
+        const catData = [
+            { label: 'Tractor', value: 48, color: '#2d6c50' },
+            { label: 'Harvester', value: 28, color: '#3b82f6' },
+            { label: 'Drone', value: 14, color: '#f59e0b' },
+            { label: 'Other', value: 10, color: '#94a3b8' },
+        ];
+        const total = catData.reduce((a, d) => a + d.value, 0);
+        let startAngle = -Math.PI / 2;
+        const cx = 100, cy = 100, R = 80, r = 48;
+        let paths = '';
+        catData.forEach(d => {
+            const angle = (d.value / total) * 2 * Math.PI;
+            const x1 = cx + R * Math.cos(startAngle), y1 = cy + R * Math.sin(startAngle);
+            const x2 = cx + R * Math.cos(startAngle + angle), y2 = cy + R * Math.sin(startAngle + angle);
+            const ix1 = cx + r * Math.cos(startAngle + angle), iy1 = cy + r * Math.sin(startAngle + angle);
+            const ix2 = cx + r * Math.cos(startAngle), iy2 = cy + r * Math.sin(startAngle);
+            const large = angle > Math.PI ? 1 : 0;
+            paths += `<path class="donut-segment" d="M${x1},${y1} A${R},${R},0,${large},1,${x2},${y2} L${ix1},${iy1} A${r},${r},0,${large},0,${ix2},${iy2} Z" fill="${d.color}"/>`;
+            startAngle += angle;
+        });
+        paths += `<text x="100" y="95" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="18" fill="#0f172a">${total}</text>`;
+        paths += `<text x="100" y="115" text-anchor="middle" font-family="Manrope" font-size="11" fill="#94a3b8">Total</text>`;
+        document.getElementById('donut-chart').innerHTML = paths;
+        document.getElementById('donut-legend').innerHTML = catData.map(d => `
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:0.85rem; font-weight:600;">
+                <span style="width:12px; height:12px; border-radius:3px; background:${d.color}; flex-shrink:0;"></span>
+                <span style="flex:1;">${d.label}</span>
+                <span style="color:var(--text-muted);">${d.value}%</span>
+            </div>`).join('');
+
+        // Transactions
+        const transactions = [
+            { id:'#R2891', machine:'KUBOTA M7040', farmer:'N. Perera', amount:12000, date:'2026-02-24', status:'completed' },
+            { id:'#R2890', machine:'YANMAR RG8', farmer:'S. Bandara', amount:28000, date:'2026-02-24', status:'active' },
+            { id:'#R2889', machine:'DJI T40 Drone', farmer:'K. Silva', amount:8500, date:'2026-02-23', status:'completed' },
+            { id:'#R2888', machine:'JOHN DEERE 5075E', farmer:'M. Fernando', amount:30000, date:'2026-02-22', status:'completed' },
+            { id:'#R2887', machine:'MAHINDRA 575', farmer:'P. Jayasuriya', amount:9000, date:'2026-02-22', status:'cancelled' },
+        ];
+        const statusMap = { completed:'success', active:'info', cancelled:'danger' };
+        document.getElementById('transactions-list').innerHTML = `
+            <div class="table-wrapper">
+            <table>
+                <thead><tr><th>ID</th><th>Machine</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody>
+                ${transactions.map(t => `
+                    <tr>
+                        <td style="font-weight:700; color:var(--primary);">${t.id}</td>
+                        <td>
+                            <div style="font-weight:700; font-size:0.85rem;">${t.machine}</div>
+                            <div style="color:var(--text-muted); font-size:0.78rem;">${t.farmer}</div>
+                        </td>
+                        <td style="font-weight:700;">LKR ${t.amount.toLocaleString()}</td>
+                        <td><span class="badge badge-${statusMap[t.status]}">${t.status}</span></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>`;
+
+        // Activity Feed
+        const activities = [
+            { icon: 'person_add', color: '#10b981', text: '<strong>Nimal Perera</strong> registered as a new Lessor', time: '2 minutes ago' },
+            { icon: 'event_available', color: '#3b82f6', text: '<strong>YANMAR RG8</strong> booked for 3 days in Kandy', time: '15 minutes ago' },
+            { icon: 'star', color: '#f59e0b', text: '<strong>Kamal Silva</strong> left a 5-star review for KUBOTA M7040', time: '1 hour ago' },
+            { icon: 'precision_manufacturing', color: '#8b5cf6', text: '<strong>New machine listed:</strong> CLAAS Harvester in Ampara', time: '2 hours ago' },
+            { icon: 'payments', color: '#ec4899', text: '<strong>Escrow released</strong> — LKR 28,000 to Sunil Bandara', time: '3 hours ago' },
+            { icon: 'map', color: '#14b8a6', text: '<strong>47 machines</strong> searched in Polonnaruwa region', time: '4 hours ago' },
+        ];
+        document.getElementById('activity-feed').innerHTML = activities.map(a => `
+            <div class="activity-item">
+                <div style="width:36px; height:36px; border-radius:10px; background:${a.color}22; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <span class="material-symbols-outlined" style="font-size:1rem; color:${a.color}; font-variation-settings:'FILL' 1;">${a.icon}</span>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:0.875rem; line-height:1.5;">${a.text}</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">${a.time}</div>
+                </div>
+            </div>`).join('');
+
+        // Animate bars after render
+        setTimeout(() => {
+            document.querySelectorAll('.chart-bar-fill').forEach(el => {
+                const w = el.style.width;
+                el.style.width = '0';
+                requestAnimationFrame(() => { setTimeout(() => { el.style.width = w; }, 50); });
+            });
+        }, 100);
+    });
+    </script>
+    <style>
+        @media (max-width: 900px) { div[style*="grid-template-columns: 2fr 1fr"], div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; } }
+    </style>
+</body>
+</html>
