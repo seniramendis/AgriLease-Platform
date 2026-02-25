@@ -1,0 +1,69 @@
+/* ========================================
+   AGRILEASE - THEME VARIABLES
+   ======================================== */
+
+:root {
+    /* Brand Colors */
+    --primary: #2d6c50;
+    --primary-light: #ecfdf5;
+    --primary-dark: #1a4332;
+    --accent: #f59e0b;
+    --accent-light: #fef3c7;
+
+    /* Text Colors */
+    --text-dark: #0f172a;
+    --text-mid: #334155;
+    --text-light: #475569;
+    --text-muted: #94a3b8;
+
+    /* Background Colors */
+    --bg-light: #f8fafc;
+    --bg-white: #ffffff;
+    --bg-dark: #020617;
+
+    /* Status Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+
+    /* Shadows */
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 40px 80px -20px rgba(20, 45, 34, 0.3);
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 30px;
+    --radius-full: 9999px;
+
+    /* Transitions */
+    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s ease;
+
+    /* Spacing */
+    --section-padding: 8rem 10%;
+    --nav-height: 72px;
+
+    /* Typography */
+    --font-body: 'Manrope', sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    --font-size-4xl: 2.8rem;
+    --font-size-5xl: 3.5rem;
+
+    /* Z-index Scale */
+    --z-base: 1;
+    --z-dropdown: 50;
+    --z-sticky: 100;
+    --z-modal: 200;
+    --z-toast: 300;
+}

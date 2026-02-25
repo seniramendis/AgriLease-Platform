@@ -1,0 +1,153 @@
+<!-- ========================================
+     AGRILEASE - NAVBAR COMPONENT
+     Include in pages with: fetch/include
+     ======================================== -->
+<nav id="main-nav">
+    <a href="/index.html" class="logo">
+        <span class="material-symbols-outlined" style="font-size: 2rem; font-variation-settings: 'FILL' 1;">agriculture</span>
+        AgriLease
+    </a>
+    <div class="nav-links" id="nav-links">
+        <a href="/pages/farms.html">Browse Machines</a>
+        <a href="/pages/map.html">
+            <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">map</span>
+            Map View
+        </a>
+        <a href="/pages/crops.html">Crop Guide</a>
+        <a href="/pages/weather.html">
+            <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">wb_sunny</span>
+            Weather
+        </a>
+        <a href="#" id="nav-login-link" style="color: var(--primary); font-weight: 800;">Login</a>
+        <button class="btn btn-primary" onclick="location.href='#register'">Register as Lessor</button>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu">
+        <span class="material-symbols-outlined">menu</span>
+    </button>
+</nav>
+
+<!-- Mobile Drawer -->
+<div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer-header">
+        <span class="logo" style="font-size: 1.4rem;">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">agriculture</span>
+            AgriLease
+        </span>
+        <button class="nav-drawer-close" id="nav-drawer-close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="nav-drawer-links">
+        <a href="/index.html" class="nav-drawer-link">
+            <span class="material-symbols-outlined">home</span> Home
+        </a>
+        <a href="/pages/farms.html" class="nav-drawer-link">
+            <span class="material-symbols-outlined">precision_manufacturing</span> Browse Machines
+        </a>
+        <a href="/pages/map.html" class="nav-drawer-link">
+            <span class="material-symbols-outlined">map</span> Map View
+        </a>
+        <a href="/pages/crops.html" class="nav-drawer-link">
+            <span class="material-symbols-outlined">eco</span> Crop Guide
+        </a>
+        <a href="/pages/weather.html" class="nav-drawer-link">
+            <span class="material-symbols-outlined">wb_sunny</span> Weather
+        </a>
+        <a href="/pages/reports.html" class="nav-drawer-link">
+            <span class="material-symbols-outlined">bar_chart</span> Reports
+        </a>
+        <hr style="border-color: #eef2f6; margin: 1rem 0;">
+        <a href="#" class="nav-drawer-link" style="color: var(--primary);">
+            <span class="material-symbols-outlined">login</span> Login
+        </a>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">Register as Lessor</button>
+    </div>
+</div>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<style>
+/* Navbar styles */
+nav#main-nav {
+    position: sticky; top: 0; z-index: var(--z-sticky);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(45, 108, 80, 0.1);
+    padding: 0.8rem 5%;
+    display: flex; justify-content: space-between; align-items: center;
+    height: var(--nav-height);
+}
+nav#main-nav .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 1.5rem; color: var(--primary); letter-spacing: -0.5px;
+}
+nav#main-nav .nav-links { display: flex; gap: 2rem; align-items: center; }
+nav#main-nav .nav-links a {
+    font-size: 0.9rem; font-weight: 600; color: var(--text-dark);
+    display: flex; align-items: center; gap: 4px;
+}
+nav#main-nav .nav-links a:hover { color: var(--primary); transform: translateY(-1px); }
+nav#main-nav .nav-links a.active { color: var(--primary); }
+.nav-hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--text-dark); padding: 4px; }
+
+/* Mobile Drawer */
+.nav-drawer {
+    position: fixed; top: 0; right: -320px; bottom: 0;
+    width: 300px; background: var(--bg-white);
+    z-index: calc(var(--z-sticky) + 10);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+}
+.nav-drawer.open { right: 0; }
+.nav-drawer-header {
+    padding: 1.2rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #eef2f6;
+}
+.nav-drawer-close { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 4px; }
+.nav-drawer-links { padding: 1.5rem; display: flex; flex-direction: column; gap: 4px; }
+.nav-drawer-link {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+    color: var(--text-mid); font-weight: 600; font-size: 0.95rem;
+    transition: var(--transition-fast);
+}
+.nav-drawer-link:hover { background: var(--bg-light); color: var(--primary); }
+.nav-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,0.4);
+    z-index: calc(var(--z-sticky) + 9);
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
+}
+.nav-overlay.show { opacity: 1; pointer-events: all; }
+
+@media (max-width: 900px) {
+    nav#main-nav .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+}
+</style>
+
+<script>
+(function() {
+    const hamburger = document.getElementById('nav-hamburger');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-overlay');
+    const closeBtn = document.getElementById('nav-drawer-close');
+
+    function openDrawer() { drawer.classList.add('open'); overlay.classList.add('show'); }
+    function closeDrawer() { drawer.classList.remove('open'); overlay.classList.remove('show'); }
+
+    if (hamburger) hamburger.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    // Mark active link
+    const links = document.querySelectorAll('nav#main-nav .nav-links a');
+    links.forEach(link => {
+        if (link.href === location.href) link.classList.add('active');
+    });
+})();
+</script>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AgriLease | Premium Portal</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..0" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d6c50",
+                        "primary-dark": "#1a4332",
+                        "accent": "#f59e0b",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- 1. GLOBAL SMOOTHING --- */
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background-color: #070a09;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* --- 2. CINEMATIC BACKGROUND --- */
+        .fixed-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: filter, transform;
+        }
+
+        @keyframes slowZoom {
+            from { transform: scale(1); filter: brightness(0.4); }
+            to { transform: scale(1.1); filter: brightness(0.6); }
+        }
+
+        .animate-slow-zoom {
+            animation: slowZoom 40s infinite alternate ease-in-out;
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(7, 10, 9, 0.3) 40%, rgba(7, 10, 9, 0.95) 100%);
+            transition: opacity 1s ease;
+        }
+
+        .portal-active .fixed-bg { filter: saturate(1.4) contrast(1.1) blur(10px); }
+
+        /* --- 3. THE SLIDING GLASS ARCHITECTURE --- */
+        .main-viewport {
+            height: 100vh; width: 100vw;
+            display: flex; align-items: center; justify-content: center;
+            perspective: 1500px;
+        }
+
+        .content-card {
+            width: 100%; height: 100%; max-width: 1100px; max-height: 740px;
+            display: flex; position: relative; overflow: hidden;
+            border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(0px);
+            opacity: 0; transform: scale(0.7) translateY(50px);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: width, transform, backdrop-filter, opacity;
+        }
+
+        body.loaded .content-card { opacity: 1; transform: scale(1) translateY(0); }
+
+        .portal-active .content-card {
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(45px) saturate(1.8);
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15); width: 94%;
+        }
+
+        /* --- 4. BRAND TEXT ADJUSTMENTS --- */
+        .brand-title {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            color: white;
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            letter-spacing: -3px;
+            line-height: 0.9;
+            white-space: nowrap;
+        }
+
+        .portal-active .brand-title {
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- 5. PANELS --- */
+        .brand-pane {
+            width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 4rem; text-align: center; z-index: 20;
+            transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .portal-active .brand-pane {
+            width: 42%; align-items: flex-start; text-align: left;
+            background: rgba(26, 67, 50, 0.4); padding: 3rem;
+        }
+
+        .form-pane {
+            width: 0%; opacity: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.9); transform: translateX(60px);
+            transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1); z-index: 10;
+            overflow-y: auto; padding: 2.5rem;
+        }
+
+        .portal-active .form-pane { width: 58%; opacity: 1; transform: translateX(0); }
+
+        /* --- 6. INPUT GLASS TABS & LOGIC --- */
+        .input-group { position: relative; width: 100%; }
+        .input-group input {
+            width: 100%; padding: 1.6rem 1.4rem; background: rgba(255, 255, 255, 0.07);
+            border: 1.5px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
+            outline: none; color: #0f172a; font-size: 1.05rem; font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(8px);
+        }
+        .input-group input:focus { background: rgba(255, 255, 255, 0.2); border-color: var(--primary); box-shadow: 0 12px 40px rgba(45, 108, 80, 0.15); transform: translateY(-2px); }
+        .input-group label { position: absolute; left: 1.4rem; top: 50%; transform: translateY(-50%); color: #475569; font-size: 1rem; font-weight: 600; pointer-events: none; transition: all 0.3s ease; }
+        .input-group input:focus ~ label, .input-group input:not(:placeholder-shown) ~ label { opacity: 0; transform: translateY(-150%) scale(0.8); }
+
+        /* --- 7. BUTTONS & EXPERIENCE BUTTON FIX --- */
+        #entry-btn {
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity: 1; visibility: visible;
+        }
+
+        /* Makes Experience Here button invisible when login form is open */
+        .portal-active #entry-btn {
+            opacity: 0 !important;
+            visibility: hidden;
+            transform: scale(0.8) translateY(30px);
+            pointer-events: none;
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #2d6c50 0%, #1a4332 100%);
+            color: white !important; padding: 1.3rem; border-radius: 22px; font-weight: 800; width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px -5px rgba(45, 108, 80, 0.3); border: none; cursor: pointer; font-size: 1.1rem;
+        }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -10px rgba(26, 67, 50, 0.5); filter: brightness(1.1); }
+
+        .back-btn {
+            position: absolute; top: 2.5rem; left: 2.5rem; 
+            opacity: 0.6; transition: all 0.3s ease; cursor: pointer; color: white;
+            display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.7rem; z-index: 100;
+        }
+        .back-btn:hover { opacity: 1; color: var(--accent); }
+
+        .role-card {
+            background: white; border: 1px solid #f1f5f9; border-radius: 18px; padding: 1rem 0.4rem;
+            cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center;
+        }
+        .role-card.active { border-color: #2d6c50; background-color: #f0fdf4; transform: scale(1.05); }
+
+        .reg-role-box { display: flex; background: rgba(0, 0, 0, 0.05); padding: 5px; border-radius: 16px; gap: 5px; }
+        .reg-role-btn { flex: 1; padding: 10px; font-size: 0.8rem; font-weight: 700; border-radius: 12px; color: #64748b; transition: 0.2s; cursor: pointer; }
+        .reg-role-btn.active { background: white; color: #2d6c50; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); }
+
+        .form-stage { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 1.8rem; transition: 0.5s; }
+        .hidden-stage { display: none !important; }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } }
+        .animate-shake { animation: shake 0.4s both; }
+    </style>
+</head>
+
+<body id="main-body">
+
+    <div class="fixed-bg">
+        <img alt="Background" class="animate-slow-zoom" src="assets/img/login.jpg" 
+             onerror="this.src='https://images.unsplash.com/photo-1594488311306-791771146747?q=80&w=2070&auto=format&fit=crop'" />
+        <div class="hero-overlay"></div>
+    </div>
+
+    <div class="main-viewport">
+        <a href="index.html" class="back-btn">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>BACK</span>
+        </a>
+
+        <div class="content-card" id="portal-card">
+
+            <div class="brand-pane relative">
+                <div class="flex items-center gap-3 transition-all mb-4">
+                    <span class="material-symbols-outlined text-green-500 text-6xl portal-active:text-4xl transition-all duration-700" 
+                          style="font-variation-settings: 'FILL' 1">agriculture</span>
+                    <h1 class="brand-title">Agri<span class="text-green-500">Lease</span></h1>
+                </div>
+                <p class="text-lg md:text-xl text-white/60 mb-10 font-medium max-w-xl transition-all duration-700 portal-active:text-white/80 portal-active:text-sm portal-active:max-w-[280px]" id="tagline">
+                    Harvest more than just crops. Join Sri Lanka's elite agricultural network and turn your equipment into a growing asset.
+                </p>
+                <button id="entry-btn" class="group px-12 py-4 bg-[#2d6c50] text-white rounded-full font-extrabold text-lg shadow-2xl hover:scale-105 hover:bg-emerald-600 flex items-center gap-3 transition-all duration-300" onclick="activatePortal()">
+                    <span>Experience Here</span>
+                    <span class="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-2">arrow_forward_ios</span>
+                </button>
+            </div>
+
+            <div class="form-pane">
+                
+                <form class="form-stage" id="login-stage" onsubmit="handleFormSubmit(event, 'login')">
+                    <header class="text-center">
+                        <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Welcome Back!</h2>
+                        <p class="text-slate-500 font-medium text-sm">Choose your identity to continue...</p>
+                    </header>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="role-card active" onclick="setRole(this, 'Lessor')">
+                            <span class="material-symbols-outlined text-3xl text-slate-400">handshake</span>
+                            <p class="text-[9px] uppercase font-extrabold mt-1">Lessor</p>
+                        </div>
+                        <div class="role-card" onclick="setRole(this, 'Lessee')">
+                            <span class="material-symbols-outlined text-3xl text-slate-400">agriculture</span>
+                            <p class="text-[9px] uppercase font-extrabold mt-1">Lessee</p>
+                        </div>
+                        <div class="role-card" onclick="setRole(this, 'Driver')">
+                            <span class="material-symbols-outlined text-3xl text-slate-400">local_shipping</span>
+                            <p class="text-[9px] uppercase font-extrabold mt-1">Driver</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-5">
+                        <div class="input-group">
+                            <input type="email" placeholder=" " required />
+                            <label>Email Address</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" placeholder=" " required />
+                            <label>Password</label>
+                        </div>
+                        <button type="submit" class="btn-main mt-2">Login as <span id="login-role-text">Lessor</span></button>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">New to AgriLease? <button type="button" onclick="toggleStage('register')" class="text-primary font-extrabold hover:underline">Join us</button></p>
+                    </div>
+                </form>
+
+                <form class="form-stage hidden-stage" id="register-stage" onsubmit="handleFormSubmit(event, 'register')">
+                    <header class="text-center">
+                        <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Create Account</h2>
+                        <p class="text-slate-500 font-medium text-sm">Partner up with AgriLease Sri Lanka</p>
+                    </header>
+                    <div class="flex flex-col gap-4">
+                        <div class="input-group">
+                            <input type="text" placeholder=" " required />
+                            <label>Full Name</label>
+                        </div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Category</div>
+                        <div class="reg-role-box">
+                            <button type="button" class="reg-role-btn active" onclick="setRegRole(this, 'Lessor')">Lessor</button>
+                            <button type="button" class="reg-role-btn" onclick="setRegRole(this, 'Lessee')">Lessee</button>
+                            <button type="button" class="reg-role-btn" onclick="setRegRole(this, 'Driver')">Driver</button>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" placeholder=" " required />
+                            <label>Work Email</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" placeholder=" " required />
+                            <label>Password</label>
+                        </div>
+                        <button type="submit" class="btn-main mt-1 shadow-lg">SignUp as <span id="reg-role-text">Lessor</span></button>
+                    </div>
+                    <div class="text-center"><button type="button" onclick="toggleStage('login')" class="text-xs font-extrabold text-slate-500 uppercase tracking-widest hover:text-primary transition-colors">← Return to Login</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { document.body.classList.add('loaded'); }, 100);
+        });
+
+        function activatePortal() { document.getElementById('main-body').classList.add('portal-active'); }
+        function deactivatePortal() { document.getElementById('main-body').classList.remove('portal-active'); }
+
+        function setRole(element, role) {
+            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('login-role-text').innerText = role;
+        }
+
+        function setRegRole(btn, role) {
+            document.querySelectorAll('.reg-role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('reg-role-text').innerText = role;
+        }
+
+        function toggleStage(stage) {
+            const login = document.getElementById('login-stage');
+            const register = document.getElementById('register-stage');
+            if (stage === 'register') {
+                login.classList.add('hidden-stage');
+                register.classList.remove('hidden-stage');
+            } else {
+                register.classList.add('hidden-stage');
+                login.classList.remove('hidden-stage');
+            }
+        }
+
+        function handleFormSubmit(event, type) {
+            const card = document.getElementById('portal-card');
+            const form = event.target;
+            if (!form.checkValidity()) {
+                card.classList.add('animate-shake');
+                setTimeout(() => card.classList.remove('animate-shake'), 400);
+            } else {
+                alert(type === 'login' ? 'Logging in...' : 'Registering...');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Weather | AgriLease</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="../assets/css/theme.css"/>
+    <link rel="stylesheet" href="../assets/css/main.css"/>
+    <link rel="stylesheet" href="../assets/css/forms.css"/>
+    <style>
+        .weather-hero {
+            background: linear-gradient(135deg, #0f4c81 0%, #1a6eb5 50%, #2196f3 100%);
+            color: white; padding: 4rem 10% 3rem; position: relative; overflow: hidden;
+        }
+        .weather-hero::before {
+            content: ''; position: absolute; top: -50%; right: -10%;
+            width: 500px; height: 500px; border-radius: 50%;
+            background: rgba(255,255,255,0.04); pointer-events: none;
+        }
+        .weather-main { display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; }
+        .temp-display { font-size: clamp(5rem, 12vw, 8rem); font-weight: 800; line-height: 1; }
+        .weather-condition { font-size: 1.5rem; font-weight: 600; opacity: 0.9; margin-bottom: 0.5rem; }
+        .weather-meta { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem; }
+        .weather-meta-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; opacity: 0.85; }
+        .weather-icon-main { font-size: 6rem; opacity: 0.9; font-variation-settings: 'FILL' 1; }
+
+        .forecast-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1rem; }
+        .forecast-card {
+            background: white; border-radius: var(--radius-lg); padding: 1.5rem 1rem;
+            text-align: center; border: 1px solid #eef2f6; transition: var(--transition-fast);
+        }
+        .forecast-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .forecast-card.today { border-color: var(--primary); background: var(--primary-light); }
+        .forecast-day { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; }
+        .forecast-icon { font-size: 2.5rem; margin: 8px 0; font-variation-settings: 'FILL' 1; color: #3b82f6; }
+        .forecast-temps { display: flex; justify-content: center; gap: 10px; font-size: 0.9rem; font-weight: 700; }
+        .forecast-high { color: var(--text-dark); }
+        .forecast-low { color: var(--text-muted); }
+        .rain-bar-wrap { margin-top: 8px; }
+        .rain-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+        .rain-bar { height: 4px; background: #e2e8f0; border-radius: 99px; margin-top: 3px; overflow: hidden; }
+        .rain-fill { height: 100%; background: #3b82f6; border-radius: 99px; }
+
+        .advisory-card {
+            border-radius: var(--radius-xl); padding: 1.5rem;
+            display: flex; align-items: flex-start; gap: 1rem;
+            border-left: 4px solid;
+        }
+        .advisory-card.good { background: #f0fdf4; border-color: var(--success); }
+        .advisory-card.caution { background: #fffbeb; border-color: var(--warning); }
+        .advisory-card.warning { background: #fef2f2; border-color: var(--danger); }
+        .advisory-icon { font-size: 1.8rem; flex-shrink: 0; font-variation-settings: 'FILL' 1; }
+        .advisory-card.good .advisory-icon { color: var(--success); }
+        .advisory-card.caution .advisory-icon { color: var(--warning); }
+        .advisory-card.warning .advisory-icon { color: var(--danger); }
+    </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- Weather Hero -->
+    <div class="weather-hero">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <select class="form-control" id="location-select" style="width: auto; background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3); font-weight: 700;">
+                <option>Colombo, Western</option>
+                <option>Kandy, Central</option>
+                <option>Kurunegala, North Western</option>
+                <option>Polonnaruwa, North Central</option>
+                <option>Anuradhapura, North Central</option>
+                <option>Jaffna, Northern</option>
+                <option>Galle, Southern</option>
+            </select>
+            <button class="btn" style="background:rgba(255,255,255,0.2); color:white; padding:0.6rem 1.2rem;" id="refresh-btn">
+                <span class="material-symbols-outlined" style="font-size:1rem;">refresh</span> Refresh
+            </button>
+        </div>
+
+        <div class="weather-main">
+            <div>
+                <div class="weather-condition" id="weather-condition">Partly Cloudy</div>
+                <div class="temp-display" id="weather-temp">31°</div>
+                <div style="font-size:1rem; opacity:0.75;" id="weather-feels">Feels like 35°C</div>
+                <div class="weather-meta">
+                    <div class="weather-meta-item">
+                        <span class="material-symbols-outlined" style="font-size:1.2rem;">water_drop</span>
+                        <span id="weather-humidity">Humidity 78%</span>
+                    </div>
+                    <div class="weather-meta-item">
+                        <span class="material-symbols-outlined" style="font-size:1.2rem;">air</span>
+                        <span id="weather-wind">Wind 12 km/h</span>
+                    </div>
+                    <div class="weather-meta-item">
+                        <span class="material-symbols-outlined" style="font-size:1.2rem;">schedule</span>
+                        <span id="weather-updated">Updated just now</span>
+                    </div>
+                </div>
+            </div>
+            <span class="material-symbols-outlined weather-icon-main" id="weather-icon">partly_cloudy_day</span>
+        </div>
+    </div>
+
+    <div style="padding: 3rem 10%;">
+
+        <!-- 7-Day Forecast -->
+        <div style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-outlined" style="color: var(--primary); font-variation-settings: 'FILL' 1;">calendar_month</span>
+                7-Day Forecast
+            </h2>
+            <div class="forecast-grid" id="forecast-grid"></div>
+        </div>
+
+        <!-- Farming Advisories -->
+        <div style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-outlined" style="color: var(--primary); font-variation-settings: 'FILL' 1;">agriculture</span>
+                Farming Advisories
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem;" id="advisories-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Best Days to Work -->
+        <div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-outlined" style="color: var(--primary); font-variation-settings: 'FILL' 1;">event_available</span>
+                Best Days for Field Work This Week
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;" id="best-days-grid"></div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        let weatherData;
+        try { weatherData = (await AgriLease.API.getWeather('Colombo')).data; }
+        catch { AgriLease.Toast.error('Could not load weather data.'); return; }
+
+        const { current, forecast } = weatherData;
+
+        // Update hero
+        document.getElementById('weather-temp').textContent = `${current.temp}°`;
+        document.getElementById('weather-condition').textContent = current.condition;
+        document.getElementById('weather-feels').textContent = `Feels like ${current.feels_like}°C`;
+        document.getElementById('weather-humidity').textContent = `Humidity ${current.humidity}%`;
+        document.getElementById('weather-wind').textContent = `Wind ${current.wind} km/h`;
+        document.getElementById('weather-icon').textContent = current.icon;
+        document.getElementById('weather-updated').textContent = `Updated ${AgriLease.Format.relativeTime(new Date().toISOString())}`;
+
+        // Render forecast
+        document.getElementById('forecast-grid').innerHTML = forecast.map((day, i) => `
+            <div class="forecast-card ${i === 0 ? 'today' : ''}">
+                <div class="forecast-day">${i === 0 ? 'TODAY' : day.day}</div>
+                <span class="material-symbols-outlined forecast-icon">${day.icon}</span>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">${day.condition}</div>
+                <div class="forecast-temps">
+                    <span class="forecast-high">${day.high}°</span>
+                    <span class="forecast-low">${day.low}°</span>
+                </div>
+                <div class="rain-bar-wrap">
+                    <div class="rain-label">💧 ${day.rain}% rain</div>
+                    <div class="rain-bar"><div class="rain-fill" style="width:${day.rain}%;"></div></div>
+                </div>
+            </div>`).join('');
+
+        // Advisories
+        const advisories = [
+            {
+                type: forecast[0].rain < 30 ? 'good' : 'caution',
+                icon: forecast[0].rain < 30 ? 'check_circle' : 'warning',
+                title: 'Field Operations',
+                text: forecast[0].rain < 30
+                    ? 'Conditions are ideal for tractor work, ploughing, and planting today. Low rain probability ensures good machine performance.'
+                    : 'Moderate rain expected. Schedule machinery operations for morning hours and avoid low-lying waterlogged areas.'
+            },
+            {
+                type: forecast[2].rain > 60 ? 'warning' : 'good',
+                icon: forecast[2].rain > 60 ? 'storm' : 'wb_sunny',
+                title: 'Irrigation Planning',
+                text: forecast[2].rain > 60
+                    ? 'Heavy rainfall forecast mid-week. Reduce or pause irrigation to avoid waterlogging. Monitor drainage channels.'
+                    : 'Dry conditions expected. Ensure irrigation systems are operational. Prioritize moisture-sensitive crops.'
+            },
+            {
+                type: 'caution',
+                icon: 'pest_control',
+                title: 'Pest & Disease Risk',
+                text: `High humidity (${current.humidity}%) combined with warm temperatures creates elevated risk for fungal diseases. Apply preventive fungicide for rice crops if needed.`
+            },
+            {
+                type: 'good',
+                icon: 'agriculture',
+                title: 'Harvest Readiness',
+                text: 'Dry and warm conditions in the second half of the week are suitable for harvesting dry crops. Plan harvester bookings in advance.'
+            },
+        ];
+
+        document.getElementById('advisories-grid').innerHTML = advisories.map(a => `
+            <div class="advisory-card ${a.type}">
+                <span class="material-symbols-outlined advisory-icon" style="font-variation-settings: 'FILL' 1;">${a.icon}</span>
+                <div>
+                    <div style="font-weight:800; margin-bottom:6px;">${a.title}</div>
+                    <div style="font-size:0.9rem; line-height:1.6; color:var(--text-mid);">${a.text}</div>
+                </div>
+            </div>`).join('');
+
+        // Best days
+        const bestDays = forecast.map((day, i) => {
+            const score = 100 - day.rain - (day.high > 35 ? 20 : 0);
+            const level = score > 70 ? { label: 'Excellent', color: 'var(--success)', bg: '#f0fdf4' } :
+                          score > 45 ? { label: 'Fair', color: 'var(--warning)', bg: '#fffbeb' } :
+                          { label: 'Poor', color: 'var(--danger)', bg: '#fef2f2' };
+            return { ...day, score, level, index: i };
+        });
+
+        document.getElementById('best-days-grid').innerHTML = bestDays.map(d => `
+            <div style="background:${d.level.bg}; border-radius:var(--radius-lg); padding:1.2rem; text-align:center; border: 1px solid ${d.level.color}22;">
+                <div style="font-weight:800; font-size:0.85rem; margin-bottom:8px;">${d.index === 0 ? 'TODAY' : d.day}</div>
+                <span class="material-symbols-outlined" style="font-size:2rem; color:${d.level.color}; font-variation-settings:'FILL' 1;">${d.icon}</span>
+                <div style="font-size:1.5rem; font-weight:800; color:${d.level.color}; margin:8px 0;">${d.level.label}</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">💧 ${d.rain}% rain · ${d.high}°/${d.low}°</div>
+            </div>`).join('');
+
+        // Refresh button
+        document.getElementById('refresh-btn').addEventListener('click', () => {
+            AgriLease.Toast.success('Weather data refreshed!');
+        });
+    });
+    </script>
+</body>
+</html>
