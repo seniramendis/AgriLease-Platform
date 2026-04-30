@@ -3,44 +3,45 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 header('Content-Type: application/json');
+
+// ✅ FIX: Start session BEFORE any output
+session_start();
+
 require 'db_connect.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
-// We only care about the Email and Password!
 if (isset($data->email) && isset($data->password)) {
     try {
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Find the user by their email - Now also selecting 'status'
         $stmt = $conn->prepare("SELECT id, full_name, role, password_hash, status FROM users WHERE email = ?");
         $stmt->execute([$data->email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // 1. Verify the user exists AND the encrypted password matches
         if ($user && password_verify($data->password, $user['password_hash'])) {
 
-            // 2. REAL WORLD SECURITY: Check if the account is Banned
-            // This prevents banned users from entering their dashboards
             if (isset($user['status']) && $user['status'] === 'Banned') {
                 echo json_encode([
                     "success" => false,
                     "message" => "Access Denied: Your account has been suspended. Please contact support."
                 ]);
-                exit; // Stop the script here
+                exit;
             }
 
-            // 3. Success! Send the REAL data from the database
-            // 3. Success! Send the REAL data from the database
-// ADDING: 'email' and 'phone' so the dashboard can unlock the NIC verification
+            // ✅ FIX: Save user to PHP session so backend APIs can verify who is logged in
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role']    = $user['role'];
+            $_SESSION['name']    = $user['full_name'];
+
             echo json_encode([
                 "success" => true,
                 "message" => "Login successful",
                 "user" => [
-                    "id" => $user['id'],
-                    "name" => $user['full_name'],
-                    "email" => $data->email, // This ensures the email is saved to localStorage
-                    "role" => $user['role']
+                    "id"    => $user['id'],
+                    "name"  => $user['full_name'],
+                    "email" => $data->email,
+                    "role"  => $user['role']
                 ]
             ]);
 
