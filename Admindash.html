@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AgriLease | Admin Command Center</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2d6c50",
+              "primary-dark": "#1a4332",
+              accent: "#f59e0b",
+              "background-light": "#f8fafc",
+              "background-dark": "#151d19",
+              "sidebar-navy": "#070a09",
+            },
+            fontFamily: {
+              display: ["Manrope", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              "2xl": "1rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Manrope", sans-serif;
+        background-color: #f1f5f9;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 600,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow:
+          0 20px 25px -5px rgba(45, 108, 80, 0.1),
+          0 10px 10px -5px rgba(45, 108, 80, 0.04);
+        border-color: rgba(45, 108, 80, 0.2);
+      }
+
+      .no-lift:hover {
+        transform: none !important;
+      }
+
+      .fade-in-up {
+        opacity: 0;
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .delay-100 {
+        animation-delay: 100ms;
+      }
+      .delay-200 {
+        animation-delay: 200ms;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .btn-gradient {
+        background: linear-gradient(135deg, #2d6c50 0%, #1a4332 100%);
+        transition: all 0.3s ease;
+      }
+      .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(45, 108, 80, 0.4);
+      }
+
+      .sidebar-active {
+        background: linear-gradient(
+          90deg,
+          rgba(45, 108, 80, 0.2) 0%,
+          transparent 100%
+        );
+        border-left: 4px solid #2d6c50;
+        color: white !important;
+      }
+
+      .view-section {
+        display: none;
+      }
+      .view-section.active {
+        display: block;
+        animation: fadeInUp 0.4s ease forwards;
+      }
+
+      .input-glass {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.75rem;
+        outline: none;
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+      }
+      .input-glass:focus {
+        border-color: var(--primary);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(45, 108, 80, 0.1);
+      }
+
+      #search-bar-container {
+        display: none;
+      }
+
+      /* Modal Style for "View" */
+      .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: rgba(15, 23, 25, 0.6);
+        backdrop-filter: blur(8px);
+        align-items: center;
+        justify-content: center;
+      }
+      .modal.active {
+        display: flex;
+      }
+    </style>
+  </head>
+
+  <body
+    class="text-slate-900 antialiased font-display bg-gradient-to-br from-slate-50 to-slate-200"
+  >
+    <div id="userModal" class="modal">
+      <div
+        class="glass-card w-full max-w-md p-8 rounded-3xl relative overflow-hidden"
+      >
+        <button
+          onclick="closeModal()"
+          class="absolute top-4 right-4 text-slate-400 hover:text-red-500"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="flex flex-col items-center">
+          <div
+            id="modal-initials"
+            class="size-20 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-lg"
+          >
+            --
+          </div>
+          <h3 id="modal-name" class="text-2xl font-extrabold text-slate-800">
+            User Name
+          </h3>
+          <p
+            id="modal-role"
+            class="text-primary font-bold uppercase text-xs tracking-widest mt-1"
+          >
+            Role
+          </p>
+
+          <div class="w-full mt-8 space-y-4">
+            <div class="flex justify-between border-b pb-2">
+              <span class="text-slate-400 text-sm">Email</span>
+              <span id="modal-email" class="text-slate-800 font-bold text-sm"
+                >user@example.com</span
+              >
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <span class="text-slate-400 text-sm">Joined Date</span>
+              <span id="modal-joined" class="text-slate-800 font-bold text-sm"
+                >Apr 29, 2026</span
+              >
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <span class="text-slate-400 text-sm">Status</span>
+              <span class="text-emerald-500 font-bold text-sm"
+                >Account Verified</span
+              >
+            </div>
+          </div>
+          <button
+            onclick="closeModal()"
+            class="mt-8 w-full py-3 btn-gradient text-white rounded-xl font-bold shadow-lg"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+      <aside
+        class="w-64 bg-sidebar-navy flex-shrink-0 flex flex-col shadow-2xl z-20"
+      >
+        <div class="p-6 flex items-center gap-3 border-b border-white/5">
+          <span
+            class="material-symbols-outlined text-green-500 text-4xl"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >agriculture</span
+          >
+          <h1 class="text-white font-extrabold text-2xl tracking-tight">
+            Agri<span class="text-green-500">Lease</span>
+          </h1>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2">
+          <a
+            href="#"
+            id="nav-dashboard"
+            onclick="switchView('dashboard', this)"
+            class="nav-btn sidebar-active flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-all duration-300"
+          >
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="text-sm font-bold">Dashboard</span>
+          </a>
+          <a
+            href="#"
+            id="nav-verifications"
+            onclick="switchView('verifications', this)"
+            class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300"
+          >
+            <span class="material-symbols-outlined">verified_user</span>
+            <span class="text-sm font-medium">Verifications</span>
+          </a>
+          <a
+            href="#"
+            id="nav-escrow"
+            onclick="switchView('escrow', this)"
+            class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300"
+          >
+            <span class="material-symbols-outlined"
+              >account_balance_wallet</span
+            >
+            <span class="text-sm font-medium">Escrow Center</span>
+          </a>
+          <a
+            href="#"
+            id="nav-disputes"
+            onclick="switchView('disputes', this)"
+            class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300"
+          >
+            <span class="material-symbols-outlined">report_problem</span>
+            <span class="text-sm font-medium">Dispute Logs</span>
+          </a>
+          <a
+            href="#"
+            id="nav-settings"
+            onclick="switchView('settings', this)"
+            class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300"
+          >
+            <span class="material-symbols-outlined">settings</span>
+            <span class="text-sm font-medium">Settings</span>
+          </a>
+        </nav>
+        <div class="p-4 border-t border-white/5 bg-black/20">
+          <div
+            class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white transition-colors cursor-pointer rounded-xl hover:bg-white/5"
+            onclick="logoutUser()"
+          >
+            <div
+              class="user-initials-display size-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-inner"
+            >
+              --
+            </div>
+            <div class="overflow-hidden">
+              <p
+                class="user-name-display text-sm font-extrabold text-white truncate"
+              >
+                Loading...
+              </p>
+              <p
+                class="text-xs truncate text-primary font-medium tracking-wide"
+              >
+                Logout
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="flex-1 overflow-y-auto relative pb-12">
+        <header
+          class="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200 px-8 py-5 flex items-center justify-between shadow-sm fade-in-up"
+        >
+          <div class="flex-1 hidden md:block">
+            <h2
+              id="header-title"
+              class="text-2xl font-extrabold text-slate-800 tracking-tight"
+            >
+              Command Center
+            </h2>
+            <p id="header-subtitle" class="text-sm font-medium text-slate-500">
+              Platform health and operational overview
+            </p>
+          </div>
+
+          <div
+            id="search-bar-container"
+            class="flex items-center justify-center flex-1 max-w-2xl w-full mx-auto"
+          >
+            <div class="relative w-full group">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors"
+                >search</span
+              >
+              <input
+                id="global-search"
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-100/80 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-inner"
+                placeholder="Global search users..."
+                type="text"
+              />
+            </div>
+          </div>
+
+          <div class="flex-1 flex justify-end items-center gap-4">
+            <button
+              onclick="handleNotificationClick()"
+              class="size-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 hover:border-primary hover:text-primary transition-all shadow-sm hover:shadow-md relative"
+            >
+              <span class="material-symbols-outlined">notifications</span>
+              <span
+                class="absolute top-2 right-2 size-2.5 bg-red-500 rounded-full border-2 border-white"
+              ></span>
+            </button>
+            <button
+              onclick="
+                switchView('settings', document.getElementById('nav-settings'))
+              "
+              class="size-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 hover:border-primary hover:text-primary transition-all shadow-sm hover:shadow-md"
+            >
+              <span class="material-symbols-outlined">settings</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="p-8 space-y-8 max-w-7xl mx-auto">
+          <div id="view-dashboard" class="view-section active">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div class="glass-card p-6 rounded-2xl fade-in-up">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p
+                      class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                    >
+                      Active Leases
+                    </p>
+                    <h3
+                      id="stat-leases"
+                      class="text-3xl font-extrabold text-slate-800 mt-2"
+                    >
+                      0
+                    </h3>
+                  </div>
+                  <span
+                    class="px-2.5 py-1 rounded-lg bg-emerald-100 text-primary text-xs font-extrabold shadow-sm"
+                    >Live</span
+                  >
+                </div>
+                <div
+                  class="mt-5 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"
+                >
+                  <div
+                    class="bg-gradient-to-r from-primary to-emerald-400 h-full w-[72%] rounded-full"
+                  ></div>
+                </div>
+              </div>
+              <div class="glass-card p-6 rounded-2xl fade-in-up delay-100">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p
+                      class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                    >
+                      Registered Users
+                    </p>
+                    <h3
+                      id="stat-verifications"
+                      class="text-3xl font-extrabold text-slate-800 mt-2"
+                    >
+                      0
+                    </h3>
+                  </div>
+                  <span
+                    class="px-2.5 py-1 rounded-lg bg-amber-100 text-accent text-xs font-extrabold shadow-sm"
+                    >Total</span
+                  >
+                </div>
+                <div class="mt-5 flex items-center gap-2">
+                  <span
+                    class="text-xs text-accent font-extrabold bg-amber-50 px-2 py-0.5 rounded"
+                    >All Roles</span
+                  >
+                </div>
+              </div>
+              <div class="glass-card p-6 rounded-2xl fade-in-up delay-200">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p
+                      class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                    >
+                      In Escrow (LKR)
+                    </p>
+                    <h3
+                      id="stat-escrow"
+                      class="text-3xl font-extrabold text-slate-800 mt-2"
+                    >
+                      LKR 0.00
+                    </h3>
+                  </div>
+                  <div
+                    class="size-10 rounded-full bg-primary/10 flex items-center justify-center"
+                  >
+                    <span class="material-symbols-outlined text-primary"
+                      >account_balance</span
+                    >
+                  </div>
+                </div>
+                <p class="mt-4 text-xs font-medium text-slate-500">
+                  Total volume across database
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in-up delay-200"
+            >
+              <div class="glass-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-6">
+                  <h4 class="font-extrabold text-slate-800">
+                    Monthly Transaction Volume
+                  </h4>
+                  <select
+                    class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 focus:ring-primary px-3 py-1.5"
+                    title="Filter timeframe"
+                  >
+                    <option>Last 6 Months</option>
+                  </select>
+                </div>
+                <div class="h-64 flex items-end gap-2 relative">
+                  <svg
+                    class="absolute inset-0 w-full h-full overflow-visible drop-shadow-md"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 100 100"
+                  >
+                    <path
+                      id="chart-line"
+                      d="M 0 80 L 20 80 L 40 80 L 60 80 L 80 80 L 100 80"
+                      fill="none"
+                      stroke="#2d6c50"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    ></path>
+                    <path
+                      id="chart-fill"
+                      d="M 0 80 L 20 80 L 40 80 L 60 80 L 80 80 L 100 80 L 100 100 L 0 100 Z"
+                      fill="url(#grad)"
+                      opacity="0.15"
+                    ></path>
+                    <defs>
+                      <linearGradient
+                        id="grad"
+                        x1="0%"
+                        x2="0%"
+                        y1="0%"
+                        y2="100%"
+                      >
+                        <stop
+                          offset="0%"
+                          style="stop-color: #2d6c50; stop-opacity: 1"
+                        ></stop>
+                        <stop
+                          offset="100%"
+                          style="stop-color: #2d6c50; stop-opacity: 0"
+                        ></stop>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div
+                    class="flex justify-between w-full mt-2 self-end text-[10px] text-slate-400 uppercase font-extrabold pt-64 relative z-10"
+                  >
+                    <span>Jan</span><span>Feb</span><span>Mar</span
+                    ><span>Apr</span><span>May</span><span>Jun</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-6">
+                  <h4 class="font-extrabold text-slate-800">
+                    System Quick Actions
+                  </h4>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <button
+                    onclick="
+                      switchView(
+                        'verifications',
+                        document.getElementById('nav-verifications'),
+                      )
+                    "
+                    class="p-5 border border-slate-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-left flex flex-col gap-3"
+                  >
+                    <span
+                      class="material-symbols-outlined text-primary text-3xl"
+                      >verified_user</span
+                    >
+                    <div>
+                      <p class="font-extrabold text-slate-800 text-sm">
+                        Approve Users
+                      </p>
+                      <p class="text-xs text-slate-500 mt-1">Check Directory</p>
+                    </div>
+                  </button>
+                  <button
+                    onclick="
+                      switchView(
+                        'escrow',
+                        document.getElementById('nav-escrow'),
+                      )
+                    "
+                    class="p-5 border border-slate-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-left flex flex-col gap-3"
+                  >
+                    <span
+                      class="material-symbols-outlined text-primary text-3xl"
+                      >payments</span
+                    >
+                    <div>
+                      <p class="font-extrabold text-slate-800 text-sm">
+                        Release Payouts
+                      </p>
+                      <p class="text-xs text-slate-500 mt-1">Manage Escrow</p>
+                    </div>
+                  </button>
+                  <button
+                    onclick="
+                      switchView(
+                        'disputes',
+                        document.getElementById('nav-disputes'),
+                      )
+                    "
+                    class="p-5 border border-red-200 bg-red-50/50 rounded-xl hover:border-red-400 hover:bg-red-50 transition-all text-left flex flex-col gap-3"
+                  >
+                    <span
+                      class="material-symbols-outlined text-red-500 text-3xl"
+                      >report_problem</span
+                    >
+                    <div>
+                      <p class="font-extrabold text-red-800 text-sm">
+                        Resolve Disputes
+                      </p>
+                      <p class="text-xs text-red-600/80 mt-1">
+                        1 Critical Alert
+                      </p>
+                    </div>
+                  </button>
+                  <button
+                    class="p-5 border border-slate-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-left flex flex-col gap-3"
+                  >
+                    <span
+                      class="material-symbols-outlined text-slate-600 text-3xl"
+                      >analytics</span
+                    >
+                    <div>
+                      <p class="font-extrabold text-slate-800 text-sm">
+                        Generate Reports
+                      </p>
+                      <p class="text-xs text-slate-500 mt-1">System Health</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="view-verifications" class="view-section">
+            <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+              <div
+                class="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50"
+              >
+                <h4 class="font-extrabold text-slate-800 text-lg">
+                  Identity & Equipment Verifications
+                </h4>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead
+                    class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100"
+                  >
+                    <tr>
+                      <th class="px-6 py-4">User Details</th>
+                      <th class="px-6 py-4">Role / Asset</th>
+                      <th class="px-6 py-4">Status</th>
+                      <th class="px-6 py-4 text-right">Admin Action</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="verifications-table-body"
+                    class="divide-y divide-slate-50"
+                  >
+                    <tr>
+                      <td
+                        colspan="4"
+                        class="text-center py-8 text-slate-400 font-medium"
+                      >
+                        Loading user data...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="view-escrow" class="view-section">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div
+                class="glass-card p-6 rounded-2xl flex items-center gap-5 border-l-4 border-l-primary"
+              >
+                <div
+                  class="size-14 bg-primary/10 rounded-full flex items-center justify-center text-primary"
+                >
+                  <span class="material-symbols-outlined text-3xl">lock</span>
+                </div>
+                <div>
+                  <p
+                    class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                  >
+                    Total Funds Locked
+                  </p>
+                  <h3
+                    class="stat-escrow-display text-3xl font-extrabold text-slate-800 mt-1"
+                  >
+                    LKR 0.00
+                  </h3>
+                </div>
+              </div>
+              <div
+                class="glass-card p-6 rounded-2xl flex items-center gap-5 border-l-4 border-l-emerald-500"
+              >
+                <div
+                  class="size-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600"
+                >
+                  <span class="material-symbols-outlined text-3xl"
+                    >outbound</span
+                  >
+                </div>
+                <div>
+                  <p
+                    class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                  >
+                    Released This Week
+                  </p>
+                  <h3 class="text-3xl font-extrabold text-slate-800 mt-1">
+                    LKR 0.00
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="view-disputes" class="view-section">
+            <div
+              class="glass-card rounded-2xl p-6 text-center text-slate-500 py-20"
+            >
+              <span
+                class="material-symbols-outlined text-6xl mb-4 opacity-50 text-red-400"
+                >report_problem</span
+              >
+              <h3 class="text-xl font-extrabold text-slate-800">
+                No Active Disputes
+              </h3>
+              <p>
+                All clear! Users will open tickets here if there are issues.
+              </p>
+            </div>
+          </div>
+
+          <div id="view-settings" class="view-section">
+            <div class="max-w-3xl mx-auto glass-card rounded-2xl p-8 shadow-sm">
+              <h3
+                class="text-2xl font-extrabold text-slate-800 mb-6 border-b border-slate-100 pb-4"
+              >
+                Platform Settings
+              </h3>
+              <div class="space-y-6">
+                <div>
+                  <h4
+                    class="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-4"
+                  >
+                    Financial Configurations
+                  </h4>
+                  <div class="grid grid-cols-2 gap-6">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-2"
+                        >Default Platform Fee (%)</label
+                      >
+                      <input
+                        type="number"
+                        value="10"
+                        class="input-glass"
+                        title="Set Fee Percentage"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-2"
+                        >Escrow Hold Period (Days)</label
+                      >
+                      <input
+                        type="number"
+                        value="3"
+                        class="input-glass"
+                        title="Set Hold Days"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="pt-6 border-t border-slate-100 flex justify-end gap-3"
+                >
+                  <button
+                    class="px-6 py-3 bg-white border border-slate-200 rounded-xl text-sm font-extrabold text-slate-600 hover:bg-slate-50 transition-colors"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    class="px-6 py-3 btn-gradient text-white rounded-xl text-sm font-extrabold shadow-lg shadow-primary/30"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      let currentUser = null;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // AUTHENTICATION CHECK
+        const userData = localStorage.getItem("agrilease_user");
+        if (!userData) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        currentUser = JSON.parse(userData);
+        if (currentUser.role !== "Admin") {
+          alert("Restricted Area. Admin access required.");
+          window.location.href = "login.html";
+          return;
+        }
+
+        // Inject Admin Name
+        document
+          .querySelectorAll(".user-name-display")
+          .forEach((el) => (el.innerText = currentUser.name));
+        let initials = currentUser.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+        document
+          .querySelectorAll(".user-initials-display")
+          .forEach((el) => (el.innerText = initials));
+
+        // Initial Load
+        loadAdminData();
+        loadUsers();
+        initSearch();
+      });
+
+      async function loadAdminData() {
+        try {
+          const res = await fetch("api/admin_stats.php");
+          const result = await res.json();
+          if (result.success) {
+            // Update UI Counters
+            document.getElementById("stat-leases").innerText =
+              result.data.leases;
+            document.getElementById("stat-verifications").innerText =
+              result.data.users;
+
+            // Escrow Formatting (forces 0.00 if empty)
+            const escrowVal = result.data.escrow || "0.00";
+            document.getElementById("stat-escrow").innerText =
+              "LKR " +
+              Number(escrowVal).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+              });
+            document.querySelector(".stat-escrow-display").innerText =
+              "LKR " +
+              Number(escrowVal).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+              });
+
+            // Update Volume Chart with real DB data
+            if (result.data.chart) {
+              updateChart(result.data.chart);
+            }
+          }
+        } catch (e) {
+          console.error("Error loading stats:", e);
+        }
+      }
+
+      function updateChart(data) {
+        const path = document.getElementById("chart-line");
+        const fill = document.getElementById("chart-fill");
+        if (!path || !fill) return;
+
+        const hasData = data.some((d) => d.value > 0);
+        let points = "";
+
+        if (!hasData) {
+          // FLAT LINE: Perfectly straight across the bottom if no money is in DB
+          points = "M 0 80 L 20 80 L 40 80 L 60 80 L 80 80 L 100 80";
+        } else {
+          // DYNAMIC CURVE: Scaled to the highest value in DB
+          const maxVal = Math.max(...data.map((d) => d.value)) || 1;
+          const h = (val) => 80 - (val / maxVal) * 60; // Maps DB value to SVG height
+
+          points = `M 0 ${h(data[0].value)} 
+                    L 20 ${h(data[1].value)} 
+                    L 40 ${h(data[2].value)} 
+                    L 60 ${h(data[3].value)} 
+                    L 80 ${h(data[4].value)} 
+                    L 100 ${h(data[5].value)}`;
+        }
+
+        path.setAttribute("d", points);
+        fill.setAttribute("d", points + " V 100 H 0 Z");
+      }
+
+      async function loadUsers() {
+        try {
+          const res = await fetch("api/admin_users.php");
+          const result = await res.json();
+          const tbody = document.getElementById("verifications-table-body");
+          tbody.innerHTML = "";
+
+          if (result.success && result.data.length > 0) {
+            result.data.forEach((user) => {
+              let initials = user.full_name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .substring(0, 2)
+                .toUpperCase();
+              let badgeColor =
+                user.role === "Admin"
+                  ? "bg-red-100 text-red-600 border-red-200"
+                  : user.role === "Lessor"
+                    ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                    : "bg-blue-100 text-blue-700 border-blue-200";
+
+              tbody.innerHTML += `
+                <tr id="user-row-${user.id}" class="hover:bg-slate-50/50 transition-colors group cursor-pointer searchable-row">
+                    <td class="px-6 py-5">
+                        <div class="flex items-center gap-4">
+                            <div class="size-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm">${initials}</div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">${user.full_name}</p>
+                                <p class="text-xs text-slate-500 font-medium">${user.email}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <p class="text-xs font-bold text-slate-700">${user.role}</p>
+                        <p class="text-[10px] font-bold text-primary uppercase mt-0.5">Joined: ${user.joined_date}</p>
+                    </td>
+                    <td class="px-6 py-5"><span class="px-3 py-1 rounded-lg border text-[10px] font-extrabold tracking-wider ${badgeColor}">Verified</span></td>
+                    <td class="px-6 py-5 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="banUser(${user.id}, '${user.full_name}')" class="bg-white border border-slate-200 hover:bg-red-50 text-red-500 px-4 py-2 rounded-xl transition-all shadow-sm text-xs font-extrabold">Ban</button>
+                            <button onclick="viewUser('${user.full_name}', '${user.email}', '${user.role}', '${user.joined_date}')" class="btn-gradient text-white px-4 py-2 rounded-xl shadow-sm text-xs font-extrabold">View</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+          } else {
+            tbody.innerHTML =
+              '<tr><td colspan="4" class="text-center py-8 text-slate-400 font-medium">No users found in database.</td></tr>';
+          }
+        } catch (e) {
+          console.error("Error loading users:", e);
+        }
+      }
+
+      // BAN FUNCTIONALITY
+      async function banUser(id, name) {
+        // Safety check: Do we know who the current admin is?
+        if (!currentUser || !currentUser.id) {
+          showToast(
+            "Error: Admin session invalid. Please log out and back in.",
+            "error",
+          );
+          return;
+        }
+
+        if (confirm(`Are you sure you want to permanently BAN ${name}?`)) {
+          try {
+            const response = await fetch("api/ban_user.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: id,
+                admin_id: currentUser.id, // Sending the REAL id from login
+              }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              const row = document.getElementById(`user-row-${id}`);
+              if (row) {
+                row.style.transition = "all 0.5s ease";
+                row.style.transform = "translateX(100px)";
+                row.style.opacity = "0";
+                setTimeout(() => row.remove(), 500);
+              }
+              showToast(`${name} has been banned and action logged.`, "error");
+            } else {
+              // Shows the error from the PHP (like the Foreign Key error)
+              alert("Server Error: " + result.message);
+            }
+          } catch (err) {
+            showToast("Network error. Check your connection.", "error");
+          }
+        }
+      }
+
+      // VIEW FUNCTIONALITY
+      function viewUser(name, email, role, date) {
+        document.getElementById("modal-name").innerText = name;
+        document.getElementById("modal-email").innerText = email;
+        document.getElementById("modal-role").innerText = role;
+        document.getElementById("modal-joined").innerText = date;
+        document.getElementById("modal-initials").innerText = name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+
+        document.getElementById("userModal").classList.add("active");
+      }
+
+      function closeModal() {
+        document.getElementById("userModal").classList.remove("active");
+      }
+
+      function handleNotificationClick() {
+        alert("Opening Verification Hub to review pending requests.");
+        switchView(
+          "verifications",
+          document.getElementById("nav-verifications"),
+        );
+      }
+
+      function initSearch() {
+        const searchInput = document.getElementById("global-search");
+        searchInput.addEventListener("input", function () {
+          const filter = this.value.toLowerCase();
+          const rows = document.querySelectorAll(".searchable-row");
+          rows.forEach((row) => {
+            row.style.display = row.innerText.toLowerCase().includes(filter)
+              ? ""
+              : "none";
+          });
+        });
+      }
+
+      function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `fixed bottom-5 right-5 px-6 py-3 rounded-xl text-white font-bold shadow-2xl transition-all transform translate-y-20 z-50 ${type === "success" ? "bg-emerald-500" : "bg-red-500"}`;
+        toast.innerText = message;
+        document.body.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => (toast.style.transform = "translateY(0)"), 100);
+        // Animate out
+        setTimeout(() => {
+          toast.style.transform = "translateY(20px)";
+          toast.style.opacity = "0";
+          setTimeout(() => toast.remove(), 500);
+        }, 3000);
+      }
+
+      // Now replace your ban alert with:
+      // showToast(`${name} has been banned`, 'error');
+
+      function switchView(viewId, clickedLink) {
+        const titles = {
+          dashboard: "Command Center",
+          verifications: "Verification Hub",
+          escrow: "Escrow Ledger",
+          disputes: "Dispute Resolution",
+          settings: "System Configurations",
+        };
+        const titleEl = document.getElementById("header-title");
+        if (titleEl) titleEl.innerText = titles[viewId];
+
+        const searchContainer = document.getElementById("search-bar-container");
+        if (viewId === "verifications") {
+          searchContainer.style.display = "flex";
+        } else {
+          searchContainer.style.display = "none";
+        }
+
+        document
+          .querySelectorAll(".view-section")
+          .forEach((view) => view.classList.remove("active"));
+        document.getElementById("view-" + viewId).classList.add("active");
+
+        document.querySelectorAll(".nav-btn").forEach((link) => {
+          link.classList.remove("sidebar-active", "text-white");
+          link.classList.add("text-slate-400");
+        });
+        clickedLink.classList.remove("text-slate-400");
+        clickedLink.classList.add("sidebar-active", "text-white");
+      }
+
+      function logoutUser() {
+        // 1. Wipe storage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // 2. Set a flag so the login page knows to do a hard cleanup
+        localStorage.setItem("clear_on_arrival", "true");
+
+        // 3. Force clean redirect
+        window.location.replace("login.html");
+      }
+    </script>
+  </body>
+</html>

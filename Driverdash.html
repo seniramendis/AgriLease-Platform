@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AgriLease | Driver Command Portal</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d6c50",
+                        "primary-dark": "#1a4332",
+                        "accent": "#f59e0b",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#151d19",
+                        "sidebar-navy": "#070a09", /* Synced with login & admin dark theme */
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; background-color: #f1f5f9; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24; }
+
+        /* --- CUSTOM SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* --- ADVANCED GLASS & HOVER EFFECTS --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(45, 108, 80, 0.1), 0 10px 10px -5px rgba(45, 108, 80, 0.04);
+            border-color: rgba(45, 108, 80, 0.2);
+        }
+
+        /* --- STAGGERED ENTRANCE ANIMATIONS --- */
+        .fade-in-up { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #2d6c50 0%, #1a4332 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(45, 108, 80, 0.4); }
+
+        .sidebar-active {
+            background: linear-gradient(90deg, rgba(45, 108, 80, 0.2) 0%, transparent 100%);
+            border-left: 4px solid #2d6c50;
+            color: white !important;
+        }
+        
+        .chart-bar { transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        .chart-bar:hover { transform: scaleY(1.05); filter: brightness(1.1); }
+
+        /* View Switching Logic */
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeInUp 0.4s ease forwards; }
+
+        .input-glass {
+            width: 100%; padding: 0.8rem 1rem; background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 0.75rem;
+            outline: none; color: #0f172a; font-weight: 600; font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        .input-glass:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(45, 108, 80, 0.1); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    </style>
+</head>
+
+<body class="text-slate-900 antialiased font-display bg-gradient-to-br from-slate-50 to-slate-200">
+    <div class="flex min-h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-sidebar-navy flex-shrink-0 flex flex-col shadow-2xl z-20 fixed h-full hidden md:flex">
+            <div class="p-6 flex items-center gap-3 border-b border-white/5">
+                <span class="material-symbols-outlined text-green-500 text-4xl" style="font-variation-settings: 'FILL' 1">agriculture</span>
+                <div>
+                    <h1 class="text-white font-extrabold text-xl tracking-tight leading-none">Agri<span class="text-green-500">Lease</span></h1>
+                    <p class="text-[10px] text-green-500/70 font-bold uppercase tracking-widest mt-1">Driver Portal</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 py-6 space-y-1 overflow-y-auto">
+                <a href="#" onclick="switchView('dashboard', this, 'Driver Dashboard', 'Current Date / Time Placeholder')" class="nav-btn sidebar-active flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:bg-white/5 transition-all duration-300">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="text-sm font-bold">Dashboard</span>
+                </a>
+                <a href="#" onclick="switchView('schedule', this, 'My Schedule', 'Track your upcoming jobs and routes.')" class="nav-btn flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
+                    <span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_month</span>
+                    <span class="text-sm font-medium">Schedule</span>
+                </a>
+                <a href="#" onclick="switchView('earnings', this, 'My Earnings', 'Track your payouts and completed jobs.')" class="nav-btn flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
+                    <span class="material-symbols-outlined group-hover:text-primary transition-colors">account_balance_wallet</span>
+                    <span class="text-sm font-medium">Earnings</span>
+                </a>
+                <a href="#" onclick="switchView('profile', this, 'Driver Profile', 'Update your licenses and details.')" class="nav-btn flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
+                    <span class="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
+                    <span class="text-sm font-medium">Profile</span>
+                </a>
+                <a href="#" onclick="switchView('support', this, 'Support & Disputes', 'Get help with jobs or platform issues.')" class="nav-btn flex items-center gap-3 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
+                    <span class="material-symbols-outlined group-hover:text-accent transition-colors">help</span>
+                    <span class="text-sm font-medium">Support</span>
+                </a>
+            </nav>
+
+            <div class="p-6 border-t border-white/5 bg-black/20">
+                <div class="flex items-center gap-3 mb-4 cursor-pointer group">
+                    <div class="size-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold shadow-inner group-hover:scale-105 transition-transform">
+                        DN
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-extrabold text-white truncate group-hover:text-primary transition-colors">Driver Name</p>
+                        <p class="text-xs text-slate-400 font-mono truncate">ID: DRV-0000</p>
+                    </div>
+                </div>
+                <button class="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-bold text-slate-300 bg-white/5 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-all border border-transparent hover:border-red-500/30">
+                    <span class="material-symbols-outlined text-sm">logout</span> Secure Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-0 md:ml-64 overflow-y-auto relative pb-12">
+            
+            <header class="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200 px-8 py-5 flex items-center justify-between shadow-sm fade-in-up">
+                <div class="flex-1 hidden md:block">
+                    <h2 id="header-title" class="text-2xl font-extrabold text-slate-800 tracking-tight">Driver Dashboard</h2>
+                    <p id="header-subtitle" class="text-sm font-medium text-slate-500">Current Date / Time Placeholder</p>
+                </div>
+
+                <div class="flex items-center justify-center flex-1 max-w-2xl w-full mx-auto">
+                    <div class="relative w-full group">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                        <input class="w-full pl-10 pr-4 py-2.5 bg-slate-100/80 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-inner" placeholder="Search tasks, locations..." type="text" />
+                    </div>
+                </div>
+
+                <div class="flex-1 flex justify-end items-center gap-4">
+                    <span class="text-xs font-extrabold px-4 py-2 bg-emerald-50 border border-emerald-100 text-primary rounded-full hidden lg:flex items-center gap-2 shadow-sm">
+                        <span class="size-2 bg-primary rounded-full animate-pulse shadow-[0_0_5px_rgba(45,108,80,0.8)]"></span> Available
+                    </span>
+                    <button class="size-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 hover:border-primary hover:text-primary transition-all shadow-sm relative">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-2 right-2 size-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="px-8 mt-8 max-w-7xl mx-auto">
+                
+                <div id="view-dashboard" class="view-section active space-y-8">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 rounded-2xl fade-in-up delay-100">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Payouts (LKR)</p>
+                                    <p class="text-3xl font-extrabold text-slate-800 mt-2">000,000</p>
+                                </div>
+                                <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary">payments</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-5 text-emerald-600 text-xs font-extrabold bg-emerald-50 w-fit px-2 py-1 rounded-lg">
+                                <span class="material-symbols-outlined text-sm">trending_up</span> +00% from last month
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl fade-in-up delay-200">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Jobs Completed</p>
+                                    <p class="text-3xl font-extrabold text-slate-800 mt-2">00</p>
+                                </div>
+                                <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary">task_alt</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-5 text-accent text-xs font-extrabold bg-amber-50 w-fit px-2 py-1 rounded-lg">
+                                <span class="material-symbols-outlined text-sm">schedule</span> 0 pending this week
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl fade-in-up delay-300">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Average Rating</p>
+                                    <p class="text-3xl font-extrabold text-slate-800 mt-2">0.0/5.0</p>
+                                </div>
+                                <div class="size-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-accent">star</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-5 text-emerald-600 text-xs font-extrabold bg-emerald-50 w-fit px-2 py-1 rounded-lg">
+                                <span class="material-symbols-outlined text-sm">thumb_up</span> Top Tier Status
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-8 fade-in-up delay-400">
+                        <section class="col-span-12 lg:col-span-8 space-y-8">
+                            <div class="glass-card rounded-2xl overflow-hidden">
+                                <div class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center">
+                                    <h3 class="text-lg font-extrabold flex items-center gap-2 text-slate-800">
+                                        <span class="material-symbols-outlined text-primary">assignment</span> Current Assignment
+                                    </h3>
+                                    <span class="px-3 py-1 bg-amber-100 border border-amber-200 text-accent rounded-lg text-[10px] font-extrabold uppercase tracking-wider shadow-sm">In Progress</span>
+                                </div>
+                                
+                                <div class="p-0 flex flex-col md:flex-row">
+                                    <div class="md:w-1/2 p-6 flex flex-col justify-between">
+                                        <div>
+                                            <h4 class="text-xl font-extrabold text-slate-800">Task Title Placeholder</h4>
+                                            <p class="text-slate-400 text-xs font-mono font-bold mt-1">Job ID: #AG-000000</p>
+                                            
+                                            <div class="grid grid-cols-2 gap-y-5 gap-x-4 py-6">
+                                                <div>
+                                                    <p class="text-[10px] text-slate-400 uppercase font-extrabold tracking-widest mb-1">Client</p>
+                                                    <p class="font-bold text-sm text-slate-700">Client Name</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-[10px] text-slate-400 uppercase font-extrabold tracking-widest mb-1">Crop / Field</p>
+                                                    <p class="font-bold text-sm text-slate-700">Crop Type</p>
+                                                </div>
+                                                <div class="col-span-2">
+                                                    <p class="text-[10px] text-slate-400 uppercase font-extrabold tracking-widest mb-1">Location Details</p>
+                                                    <p class="font-medium text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">Location Address Placeholder, District.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex gap-3 mt-4">
+                                            <button class="flex-1 btn-gradient text-white font-extrabold py-3 rounded-xl flex items-center justify-center gap-2 text-sm">
+                                                <span class="material-symbols-outlined text-base">directions</span> Navigate
+                                            </button>
+                                            <button class="flex-1 bg-white border-2 border-primary text-primary font-extrabold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors shadow-sm text-sm">
+                                                <span class="material-symbols-outlined text-base">call</span> Contact
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="md:w-1/2 min-h-[350px] relative group border-l border-slate-100 bg-slate-100 overflow-hidden">
+                                        <div class="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-multiply transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://images.unsplash.com/photo-1594488311306-791771146747?q=80&w=1000&auto=format&fit=crop'); filter: grayscale(20%) sepia(30%) hue-rotate(90deg);"></div>
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                        
+                                        <div class="absolute bottom-5 right-5 flex flex-col gap-2">
+                                            <button class="size-10 bg-white/90 backdrop-blur rounded-xl shadow-lg flex items-center justify-center text-slate-700 hover:text-primary transition-colors border border-white">
+                                                <span class="material-symbols-outlined">add</span>
+                                            </button>
+                                            <button class="size-10 bg-white/90 backdrop-blur rounded-xl shadow-lg flex items-center justify-center text-slate-700 hover:text-primary transition-colors border border-white">
+                                                <span class="material-symbols-outlined">remove</span>
+                                            </button>
+                                        </div>
+                                        <div class="absolute top-5 left-5">
+                                            <div class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-[10px] font-extrabold text-slate-700 shadow-lg border border-white flex items-center gap-1.5 tracking-wider uppercase">
+                                                <span class="size-2 bg-emerald-500 rounded-full animate-pulse"></span> GPS Active
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-card rounded-2xl overflow-hidden">
+                                <div class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center">
+                                    <h3 class="text-lg font-extrabold flex items-center gap-2 text-slate-800">
+                                        <span class="material-symbols-outlined text-primary">event_note</span> Upcoming Schedule
+                                    </h3>
+                                    <button class="text-primary text-xs font-extrabold hover:underline bg-primary/5 px-3 py-1.5 rounded-lg transition-colors" onclick="switchView('schedule', document.querySelectorAll('.nav-btn')[1], 'My Schedule', 'Track your upcoming jobs')">View Calendar</button>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left">
+                                        <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100">
+                                            <tr>
+                                                <th class="px-6 py-4">Date & Time</th>
+                                                <th class="px-6 py-4">Assignment</th>
+                                                <th class="px-6 py-4">Location</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-50">
+                                            <tr class="hover:bg-slate-50/50 transition-colors group cursor-pointer">
+                                                <td class="px-6 py-4">
+                                                    <p class="font-bold text-sm text-slate-800">Date Placeholder</p>
+                                                    <p class="text-xs text-slate-500 font-medium">Time Placeholder</p>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="size-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                                                            <span class="material-symbols-outlined text-sm">agriculture</span>
+                                                        </div>
+                                                        <p class="font-bold text-sm text-slate-700">Task Type Placeholder</p>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-xs font-bold text-slate-500">Region Placeholder</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+
+                        <aside class="col-span-12 lg:col-span-4 space-y-8">
+                            
+                            <div class="glass-card rounded-2xl p-6 border-t-4 border-t-primary">
+                                <h3 class="text-lg font-extrabold flex items-center gap-2 mb-6 text-slate-800">
+                                    <span class="material-symbols-outlined text-primary">speed</span> Digital Job Card
+                                </h3>
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">Initial Reading (km/hrs)</label>
+                                        <div class="relative shadow-inner rounded-xl">
+                                            <input class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 font-mono font-bold text-lg text-slate-700 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" type="number" placeholder="0.0" />
+                                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-extrabold text-slate-400 bg-slate-200/50 px-2 py-1 rounded">INPUT</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">Final Reading (km/hrs)</label>
+                                        <div class="relative opacity-60 cursor-not-allowed">
+                                            <input class="w-full bg-slate-100 border border-slate-200 rounded-xl p-3.5 font-mono font-bold text-lg text-slate-400" disabled placeholder="Locked" type="text" />
+                                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+                                        </div>
+                                    </div>
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <button class="w-full btn-gradient text-white font-black py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 text-lg hover:scale-[1.02] active:scale-[0.98] transition-all relative overflow-hidden group">
+                                            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+                                            <span class="material-symbols-outlined text-2xl relative z-10">play_circle</span> 
+                                            <span class="relative z-10 tracking-wide">START JOB</span>
+                                        </button>
+                                        <button class="w-full mt-3 bg-slate-100 text-slate-400 font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm cursor-not-allowed border border-slate-200">
+                                            <span class="material-symbols-outlined">check_circle</span> COMPLETE JOB
+                                        </button>
+                                    </div>
+                                    <div class="bg-blue-50 border border-blue-100 p-3 rounded-lg flex items-start gap-2">
+                                        <span class="material-symbols-outlined text-blue-500 text-sm mt-0.5">info</span>
+                                        <p class="text-xs text-blue-700 font-medium leading-relaxed">Ensure GPS is enabled and initial meter reading is verified before starting.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-card rounded-2xl p-6 cursor-pointer hover:border-primary/50 transition-colors" onclick="switchView('earnings', document.querySelectorAll('.nav-btn')[2], 'My Earnings', 'Track payouts')">
+                                <div class="flex justify-between items-center mb-8">
+                                    <h3 class="text-lg font-extrabold text-slate-800">Weekly Earnings</h3>
+                                    <span class="text-[10px] font-extrabold text-primary bg-primary/10 px-2 py-1 rounded">LKR</span>
+                                </div>
+                                
+                                <div class="flex items-end justify-between h-40 gap-3 px-1 border-b border-slate-100 pb-2">
+                                    <div class="flex flex-col items-center flex-1 gap-2 h-full justify-end group">
+                                        <div class="w-full bg-slate-200 rounded-t-md h-[40%] chart-bar group-hover:bg-primary/40 relative"></div>
+                                        <span class="text-[9px] font-extrabold text-slate-400">MON</span>
+                                    </div>
+                                    <div class="flex flex-col items-center flex-1 gap-2 h-full justify-end group">
+                                        <div class="w-full bg-slate-200 rounded-t-md h-[55%] chart-bar group-hover:bg-primary/40 relative"></div>
+                                        <span class="text-[9px] font-extrabold text-slate-400">TUE</span>
+                                    </div>
+                                    <div class="flex flex-col items-center flex-1 gap-2 h-full justify-end group">
+                                        <div class="w-full bg-slate-200 rounded-t-md h-[30%] chart-bar group-hover:bg-primary/40 relative"></div>
+                                        <span class="text-[9px] font-extrabold text-slate-400">WED</span>
+                                    </div>
+                                    <div class="flex flex-col items-center flex-1 gap-2 h-full justify-end group">
+                                        <div class="w-full bg-slate-200 rounded-t-md h-[80%] chart-bar group-hover:bg-primary/40 relative"></div>
+                                        <span class="text-[9px] font-extrabold text-slate-400">THU</span>
+                                    </div>
+                                    <div class="flex flex-col items-center flex-1 gap-2 h-full justify-end group">
+                                        <div class="w-full bg-slate-200 rounded-t-md h-[65%] chart-bar group-hover:bg-primary/40 relative"></div>
+                                        <span class="text-[9px] font-extrabold text-slate-400">FRI</span>
+                                    </div>
+                                    <div class="flex flex-col items-center flex-1 gap-2 h-full justify-end group">
+                                        <div class="w-full bg-primary rounded-t-md h-[95%] chart-bar shadow-[0_-4px_12px_rgba(45,108,80,0.3)] relative"></div>
+                                        <span class="text-[9px] font-extrabold text-primary">SAT</span>
+                                    </div>
+                                    <div class="flex flex-col items-center flex-1 gap-2 h-full justify-end group">
+                                        <div class="w-full bg-slate-200 rounded-t-md h-[20%] chart-bar group-hover:bg-primary/40 relative"></div>
+                                        <span class="text-[9px] font-extrabold text-slate-400">SUN</span>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-400 font-extrabold text-center mt-3 uppercase tracking-widest">Click to view details</p>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+
+                <div id="view-schedule" class="view-section space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 glass-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+                                <h3 class="text-xl font-extrabold text-slate-800">My Calendar</h3>
+                                <div class="flex gap-2">
+                                    <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 font-bold text-sm shadow-sm hover:bg-slate-50">Today</button>
+                                    <div class="flex gap-1 bg-slate-50 rounded-lg p-1 border border-slate-100">
+                                        <button class="p-1 hover:bg-white rounded text-slate-400 shadow-sm"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+                                        <button class="p-1 hover:bg-white rounded text-slate-400 shadow-sm"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="calendar-grid text-center text-xs font-extrabold text-slate-400 mb-3 uppercase tracking-widest">
+                                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                            </div>
+                            <div class="calendar-grid text-center text-sm font-bold">
+                                <div class="py-4 text-slate-300">26</div><div class="py-4 text-slate-300">27</div>
+                                <div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">1</div>
+                                <div class="py-4 bg-primary text-white rounded-xl shadow-md cursor-pointer relative"><span class="z-10 relative">2</span><div class="absolute bottom-1 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-white"></div></div>
+                                <div class="py-4 bg-primary text-white rounded-xl shadow-md cursor-pointer relative"><span class="z-10 relative">3</span><div class="absolute bottom-1 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-white"></div></div>
+                                <div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">4</div><div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">5</div>
+                                <div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">6</div><div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">7</div>
+                                <div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">8</div><div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">9</div>
+                                <div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">10</div><div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">11</div>
+                                <div class="py-4 bg-slate-50 rounded-xl text-slate-600 border border-slate-100">12</div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-1 glass-card rounded-2xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="p-6 border-b border-slate-100 bg-white/50">
+                                <h4 class="font-extrabold text-slate-800 text-lg">Job List</h4>
+                            </div>
+                            <div class="p-6 space-y-4 flex-1 overflow-y-auto">
+                                <div class="p-4 border border-primary/30 bg-primary/5 rounded-xl">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-[10px] font-extrabold text-primary uppercase tracking-widest bg-white px-2 py-0.5 rounded shadow-sm">Oct 2, 2026</span>
+                                    </div>
+                                    <p class="font-bold text-sm text-slate-800">Task Placeholder</p>
+                                    <p class="text-xs text-slate-500 font-medium mt-1">Location: District Placeholder</p>
+                                </div>
+                                <div class="p-4 border border-slate-200 bg-slate-50 rounded-xl">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest bg-white border border-slate-200 px-2 py-0.5 rounded shadow-sm">Oct 3, 2026</span>
+                                    </div>
+                                    <p class="font-bold text-sm text-slate-800">Task Placeholder</p>
+                                    <p class="text-xs text-slate-500 font-medium mt-1">Location: District Placeholder</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-earnings" class="view-section space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-l-primary">
+                            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Cleared</p>
+                            <h3 class="text-3xl font-extrabold text-slate-800 mt-2">LKR 000,000</h3>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-l-accent">
+                            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pending Transfer</p>
+                            <h3 class="text-3xl font-extrabold text-slate-800 mt-2">LKR 00,000</h3>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl">
+                            <button class="w-full h-full border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-500 hover:text-primary hover:border-primary hover:bg-primary/5 transition-all">
+                                <span class="material-symbols-outlined mb-2 text-2xl">download</span>
+                                <span class="font-extrabold text-sm">Download Tax Report</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
+                        <div class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center">
+                            <h4 class="font-extrabold text-slate-800 text-lg">Job Payout History</h4>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4">Date</th>
+                                        <th class="px-6 py-4">Job ID</th>
+                                        <th class="px-6 py-4">Hours Logged</th>
+                                        <th class="px-6 py-4">Amount (LKR)</th>
+                                        <th class="px-6 py-4 text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50">
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="px-6 py-4 text-xs font-bold text-slate-600">Oct 20, 2026</td>
+                                        <td class="px-6 py-4 text-xs font-mono font-bold text-slate-400">#AG-000001</td>
+                                        <td class="px-6 py-4 text-xs font-bold text-slate-700">8.5 hrs</td>
+                                        <td class="px-6 py-4 text-sm font-extrabold text-slate-800">00,000</td>
+                                        <td class="px-6 py-4 text-right"><span class="px-3 py-1 rounded-lg bg-emerald-50 text-primary border border-emerald-100 text-[10px] font-extrabold tracking-wider uppercase">Cleared</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="px-6 py-4 text-xs font-bold text-slate-600">Oct 18, 2026</td>
+                                        <td class="px-6 py-4 text-xs font-mono font-bold text-slate-400">#AG-000002</td>
+                                        <td class="px-6 py-4 text-xs font-bold text-slate-700">6.0 hrs</td>
+                                        <td class="px-6 py-4 text-sm font-extrabold text-slate-800">00,000</td>
+                                        <td class="px-6 py-4 text-right"><span class="px-3 py-1 rounded-lg bg-emerald-50 text-primary border border-emerald-100 text-[10px] font-extrabold tracking-wider uppercase">Cleared</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-profile" class="view-section">
+                    <div class="max-w-3xl mx-auto glass-card rounded-2xl p-8 shadow-sm">
+                        <h3 class="text-2xl font-extrabold text-slate-800 mb-6 border-b border-slate-100 pb-4">Driver Profile & Credentials</h3>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-4">Personal Details</h4>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-600 mb-2">Full Name</label>
+                                        <input type="text" value="Driver Name" class="input-glass" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-600 mb-2">Phone Number</label>
+                                        <input type="text" value="+94 77 123 4567" class="input-glass" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 border-t border-slate-100">
+                                <h4 class="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-4">Licensing</h4>
+                                <div class="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer bg-slate-50 group">
+                                    <div class="size-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition-transform">
+                                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">badge</span>
+                                    </div>
+                                    <p class="text-sm font-extrabold text-slate-700">Update Heavy Machinery License</p>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-2">PDF, JPG, PNG (Max 5MB)</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 border-t border-slate-100 flex justify-end gap-3">
+                                <button class="px-6 py-3 bg-white border border-slate-200 rounded-xl text-sm font-extrabold text-slate-600 hover:bg-slate-50 transition-colors">Discard</button>
+                                <button class="px-6 py-3 btn-gradient text-white rounded-xl text-sm font-extrabold shadow-lg shadow-primary/30">Save Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-support" class="view-section">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-gradient-to-br from-primary to-primary-dark p-8 rounded-2xl text-white relative overflow-hidden shadow-lg h-fit">
+                            <div class="relative z-10">
+                                <h4 class="font-extrabold text-2xl mb-2 tracking-tight">Driver Support Team</h4>
+                                <p class="text-sm text-primary-light mb-8 font-medium leading-relaxed opacity-90">Having trouble with a machine or a difficult client? Create a ticket and our logistics team will assist you immediately.</p>
+                                
+                                <div class="space-y-4">
+                                    <div class="bg-white/10 backdrop-blur border border-white/20 p-4 rounded-xl flex items-center gap-4">
+                                        <span class="material-symbols-outlined">phone_in_talk</span>
+                                        <div><p class="text-xs text-white/70 uppercase font-bold tracking-widest">Emergency Hotline</p><p class="font-extrabold">011 234 5678</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined absolute -bottom-6 -right-4 text-white/10 text-[180px] rotate-12 select-none pointer-events-none">support_agent</span>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-8 shadow-sm">
+                            <h3 class="text-xl font-extrabold text-slate-800 mb-6 border-b border-slate-100 pb-4">Submit a Ticket</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-2">Issue Category</label>
+                                    <select class="input-glass">
+                                        <option>Machine Breakdown</option>
+                                        <option>Client Dispute</option>
+                                        <option>App / Payment Issue</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-2">Related Job ID (Optional)</label>
+                                    <input type="text" placeholder="#AG-" class="input-glass" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-2">Description</label>
+                                    <textarea rows="4" class="input-glass resize-none" placeholder="Describe the issue..."></textarea>
+                                </div>
+                                <button class="w-full btn-gradient text-white py-3 rounded-xl shadow-lg shadow-primary/30 text-sm font-extrabold mt-4">Submit Ticket</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function switchView(viewId, clickedLink, title, subtitle) {
+            document.getElementById('header-title').innerText = title;
+            document.getElementById('header-subtitle').innerText = subtitle;
+            
+            const views = document.querySelectorAll('.view-section');
+            views.forEach(view => view.classList.remove('active'));
+            
+            document.getElementById('view-' + viewId).classList.add('active');
+
+            const links = document.querySelectorAll('.nav-btn');
+            links.forEach(link => {
+                link.classList.remove('sidebar-active', 'text-white');
+                link.classList.add('text-slate-400');
+            });
+            
+            clickedLink.classList.remove('text-slate-400');
+            clickedLink.classList.add('sidebar-active', 'text-white');
+            
+            // Scroll top
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
