@@ -1087,15 +1087,27 @@
       </div>
     </div>
 
-        <script>
-      let currentUser = null, mapInstance = null, fieldMapInstance = null;
+    <script>
+      const _u = JSON.parse(localStorage.getItem("agrilease_user") || "null");
+      if (!_u || _u.role !== "Lessee") window.location.replace("login.html");
+      
+      let currentUser = null,
+        mapInstance = null,
+        fieldMapInstance = null;
       let tempNICValue = "";
       let generatedOTP = "";
-      const blacklistedPhoneNumbers = ["+94711111111", "+94777777777", "+94766889048"];
+      const blacklistedPhoneNumbers = [
+        "+94711111111",
+        "+94777777777",
+        "+94766889048",
+      ];
 
       document.addEventListener("DOMContentLoaded", () => {
         const userData = localStorage.getItem("agrilease_user");
-        if (!userData) { window.location.replace("login.html"); return; }
+        if (!userData) {
+          window.location.replace("login.html");
+          return;
+        }
         currentUser = JSON.parse(userData);
         syncProfileUI();
         initOverviewMap();
@@ -1113,19 +1125,32 @@
           document.querySelectorAll(".user-name-display").forEach((el) => {
             if (el) el.innerText = currentUser.name || "User";
           });
-          const userEmail = currentUser.email || currentUser.user_email || currentUser.email_address || currentUser.email_id;
+          const userEmail =
+            currentUser.email ||
+            currentUser.user_email ||
+            currentUser.email_address ||
+            currentUser.email_id;
           const emailInput = document.getElementById("set-email");
           if (emailInput) emailInput.value = userEmail || "";
-          if (document.getElementById("set-full-name")) document.getElementById("set-full-name").value = currentUser.name || "";
-          if (document.getElementById("set-phone")) document.getElementById("set-phone").value = currentUser.phone || "";
-          if (document.getElementById("set-district")) document.getElementById("set-district").value = currentUser.district || "Anuradhapura";
+          if (document.getElementById("set-full-name"))
+            document.getElementById("set-full-name").value =
+              currentUser.name || "";
+          if (document.getElementById("set-phone"))
+            document.getElementById("set-phone").value =
+              currentUser.phone || "";
+          if (document.getElementById("set-district"))
+            document.getElementById("set-district").value =
+              currentUser.district || "Anuradhapura";
 
           const nicLockedArea = document.getElementById("nic-locked-state");
           const nicInitialArea = document.getElementById("nic-initial-state");
           if (nicLockedArea && nicInitialArea) {
-            const hasData = (currentUser.phone && currentUser.phone.length >= 10) || userEmail;
+            const hasData =
+              (currentUser.phone && currentUser.phone.length >= 10) ||
+              userEmail;
             if (currentUser.nic) {
-              document.getElementById("nic-status-badge").innerText = "Verified";
+              document.getElementById("nic-status-badge").innerText =
+                "Verified";
               nicLockedArea.classList.add("hidden");
               nicInitialArea.classList.remove("hidden");
               nicInitialArea.innerHTML = `<div class='p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 font-bold text-center underline'>ID Linked: ${currentUser.nic}</div>`;
@@ -1137,30 +1162,47 @@
               nicInitialArea.classList.add("hidden");
             }
           }
-        } catch (e) { console.error("Critical Sync Error:", e); }
+        } catch (e) {
+          console.error("Critical Sync Error:", e);
+        }
       }
 
       async function updateProfile() {
         const name = document.getElementById("set-full-name").value;
         const phone = document.getElementById("set-phone").value.trim();
         const district = document.getElementById("set-district").value;
-        if (blacklistedPhoneNumbers.includes(phone) && phone !== currentUser.phone) {
-          alert(`The phone number ${phone} is already linked to another farmer account.`);
+        if (
+          blacklistedPhoneNumbers.includes(phone) &&
+          phone !== currentUser.phone
+        ) {
+          alert(
+            `The phone number ${phone} is already linked to another farmer account.`,
+          );
           return;
         }
         try {
           const res = await fetch("./api/update_profile.php", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: currentUser.id, full_name: name, phone, district }),
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: currentUser.id,
+              full_name: name,
+              phone,
+              district,
+            }),
           });
           const result = await res.json();
           if (result.success) {
             showToast("Profile Updated!", "success");
-            currentUser.name = name; currentUser.phone = phone; currentUser.district = district;
+            currentUser.name = name;
+            currentUser.phone = phone;
+            currentUser.district = district;
             localStorage.setItem("agrilease_user", JSON.stringify(currentUser));
             syncProfileUI();
           } else showToast(result.message, "error");
-        } catch (e) { showToast("Connection failed", "error"); }
+        } catch (e) {
+          showToast("Connection failed", "error");
+        }
       }
 
       async function processNIC(input) {
@@ -1174,27 +1216,44 @@
           if (match) {
             tempNICValue = match[0];
             document.getElementById("detected-nic").innerText = tempNICValue;
-            document.getElementById("nic-initial-state").classList.add("hidden");
-            document.getElementById("nic-verify-flow").classList.remove("hidden");
+            document
+              .getElementById("nic-initial-state")
+              .classList.add("hidden");
+            document
+              .getElementById("nic-verify-flow")
+              .classList.remove("hidden");
             showToast("NIC Found!", "success");
-          } else { showToast("Clear scan required.", "error"); }
-        } catch (e) { showToast("OCR Scan Error.", "error"); }
+          } else {
+            showToast("Clear scan required.", "error");
+          }
+        } catch (e) {
+          showToast("OCR Scan Error.", "error");
+        }
       }
 
       async function sendOTP(method) {
-        const target = currentUser.email || currentUser.user_email || currentUser.email_address;
+        const target =
+          currentUser.email ||
+          currentUser.user_email ||
+          currentUser.email_address;
         generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
         showToast(`Sending OTP to inbox: ${target}...`, "success");
         try {
           const response = await fetch("api/send_email_otp.php", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: target, otp: generatedOTP, user_name: currentUser.name }),
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: target,
+              otp: generatedOTP,
+              user_name: currentUser.name,
+            }),
           });
           const result = await response.json();
           if (result.status === "success") {
             showToast("OTP sent to your email!", "success");
           } else {
-            document.getElementById("sms-code-display").innerText = generatedOTP;
+            document.getElementById("sms-code-display").innerText =
+              generatedOTP;
             const smsPop = document.getElementById("sms-notification");
             smsPop.classList.add("show");
             setTimeout(() => smsPop.classList.remove("show"), 8000);
@@ -1213,13 +1272,16 @@
         if (code === generatedOTP && code !== "") {
           showToast("Identity Verified!", "success");
           await saveNICtoDB(tempNICValue);
-        } else { showToast("Invalid Code", "error"); }
+        } else {
+          showToast("Invalid Code", "error");
+        }
       }
 
       async function saveNICtoDB(nic) {
         try {
           const res = await fetch("./api/update_profile.php", {
-            method: "POST", headers: { "Content-Type": "application/json" },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: currentUser.id, nic_number: nic }),
           });
           const result = await res.json();
@@ -1229,22 +1291,34 @@
             localStorage.setItem("agrilease_user", JSON.stringify(currentUser));
             syncProfileUI();
           }
-        } catch (e) { showToast("Database Link Failed", "error"); }
+        } catch (e) {
+          showToast("Database Link Failed", "error");
+        }
       }
 
       function showToast(message, type = "success") {
         const toast = document.createElement("div");
         toast.className = `fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-xl text-white font-bold shadow-2xl transition-all duration-500 transform translate-y-0`;
-        toast.style.backgroundColor = type === "success" ? "#2d6c50" : "#dc2626";
+        toast.style.backgroundColor =
+          type === "success" ? "#2d6c50" : "#dc2626";
         toast.innerText = message;
         document.body.appendChild(toast);
-        setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 500); }, 3000);
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          setTimeout(() => toast.remove(), 500);
+        }, 3000);
       }
 
       function initOverviewMap() {
         if (!document.getElementById("overview-map-canvas")) return;
-        mapInstance = L.map("overview-map-canvas", { center: [7.8731, 80.7718], zoom: 7, zoomControl: false });
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapInstance);
+        mapInstance = L.map("overview-map-canvas", {
+          center: [7.8731, 80.7718],
+          zoom: 7,
+          zoomControl: false,
+        });
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+          mapInstance,
+        );
       }
 
       async function loadDashboardStats() {
@@ -1252,12 +1326,18 @@
           const res = await fetch(`./api/lessee/lessee_stats.php`);
           const r = await res.json();
           if (r.success) {
-            document.getElementById("stat-total-expenditure").innerText = "LKR " + Number(r.data.total_spent).toLocaleString();
-            document.getElementById("stat-active-rentals").innerText = r.data.active_count + " Machines";
-            document.getElementById("stat-pending-alerts").innerText = r.data.alerts + " Alerts";
-            if (r.data.active_booking) updateActiveAssignmentUI(r.data.active_booking);
+            document.getElementById("stat-total-expenditure").innerText =
+              "LKR " + Number(r.data.total_spent).toLocaleString();
+            document.getElementById("stat-active-rentals").innerText =
+              r.data.active_count + " Machines";
+            document.getElementById("stat-pending-alerts").innerText =
+              r.data.alerts + " Alerts";
+            if (r.data.active_booking)
+              updateActiveAssignmentUI(r.data.active_booking);
           }
-        } catch (e) { console.error(e); }
+        } catch (e) {
+          console.error(e);
+        }
       }
 
       function updateActiveAssignmentUI(booking) {
@@ -1278,10 +1358,14 @@
       }
 
       function switchView(id, link, title, sub) {
-        document.querySelectorAll(".view-section").forEach((v) => v.classList.remove("active"));
+        document
+          .querySelectorAll(".view-section")
+          .forEach((v) => v.classList.remove("active"));
         const view = document.getElementById("view-" + id);
         if (view) view.classList.add("active");
-        document.querySelectorAll(".nav-btn").forEach((l) => l.classList.remove("sidebar-active"));
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((l) => l.classList.remove("sidebar-active"));
         link.classList.add("sidebar-active");
         document.getElementById("header-title").innerText = title;
         document.getElementById("header-subtitle").innerText = sub;
@@ -1289,7 +1373,8 @@
         const searchBar = document.getElementById("search-bar-container");
         searchBar.style.display = id === "machinery" ? "block" : "none";
 
-        if (id === "dashboard" && mapInstance) setTimeout(() => mapInstance.invalidateSize(), 200);
+        if (id === "dashboard" && mapInstance)
+          setTimeout(() => mapInstance.invalidateSize(), 200);
         if (id === "fields") initFieldManagementView();
         if (id === "machinery") loadMachineryList();
         if (id === "bookings") loadActiveBookings();
@@ -1299,23 +1384,35 @@
       async function initFieldManagementView() {
         setTimeout(() => {
           if (fieldMapInstance) fieldMapInstance.remove();
-          fieldMapInstance = L.map("field-management-map", { center: [8.3114, 80.4037], zoom: 12, zoomControl: false });
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(fieldMapInstance);
+          fieldMapInstance = L.map("field-management-map", {
+            center: [8.3114, 80.4037],
+            zoom: 12,
+            zoomControl: false,
+          });
+          L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          ).addTo(fieldMapInstance);
         }, 300);
       }
 
-      function logoutUser() { localStorage.clear(); window.location.replace("login.html"); }
+      function logoutUser() {
+        localStorage.clear();
+        window.location.replace("login.html");
+      }
       function handleGlobalSearch() {}
 
       // ── MACHINERY LIST ──────────────────────────────────────────
       async function loadMachineryList() {
         const grid = document.getElementById("machinery-grid");
-        grid.innerHTML = '<div class="col-span-full text-center py-10"><p class="text-slate-400 font-bold animate-pulse">Fetching available machineries...</p></div>';
+        grid.innerHTML =
+          '<div class="col-span-full text-center py-10"><p class="text-slate-400 font-bold animate-pulse">Fetching available machineries...</p></div>';
         try {
           const res = await fetch("./api/lessee/get_machinery.php");
           const result = await res.json();
           if (result.success && result.data.length > 0) {
-            grid.innerHTML = result.data.map((m) => `
+            grid.innerHTML = result.data
+              .map(
+                (m) => `
               <div class="glass-card rounded-2xl overflow-hidden group flex flex-col p-5 shadow-sm fade-in-up">
                 <div class="h-48 bg-slate-100 rounded-xl mb-4 bg-cover bg-center transition-transform group-hover:scale-105 duration-500"
                      style="background-image: url('${m.image_url || "https://images.unsplash.com/photo-1594488311306-791771146747?auto=format&fit=crop&q=80&w=600"}')">
@@ -1336,13 +1433,17 @@
                   <button onclick="requestBooking('${m.model_name.replace(/'/g, "\\'")}', ${m.id}, ${m.hourly_rate})"
                           class="btn-gradient text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md">Book Now</button>
                 </div>
-              </div>`).join("");
+              </div>`,
+              )
+              .join("");
           } else {
-            grid.innerHTML = '<div class="col-span-full text-center py-20"><p class="text-slate-400 font-bold">No machineries found at this moment.</p></div>';
+            grid.innerHTML =
+              '<div class="col-span-full text-center py-20"><p class="text-slate-400 font-bold">No machineries found at this moment.</p></div>';
           }
         } catch (e) {
           console.error(e);
-          grid.innerHTML = '<div class="col-span-full text-center py-20"><p class="text-red-400 font-bold">Failed to load machinery. Check network.</p></div>';
+          grid.innerHTML =
+            '<div class="col-span-full text-center py-20"><p class="text-red-400 font-bold">Failed to load machinery. Check network.</p></div>';
         }
       }
 
@@ -1375,24 +1476,33 @@
           if (hoursInput) {
             hoursInput.addEventListener("input", () => {
               const h = parseFloat(hoursInput.value) || 1;
-              document.getElementById("estimated-total").innerText = "LKR " + (h * hourlyRate).toLocaleString();
+              document.getElementById("estimated-total").innerText =
+                "LKR " + (h * hourlyRate).toLocaleString();
             });
           }
         }, 100);
 
         document.getElementById("modal-confirm").onclick = async () => {
-          const hours = parseFloat(document.getElementById("booking-hours").value) || 1;
+          const hours =
+            parseFloat(document.getElementById("booking-hours").value) || 1;
           modal.classList.add("hidden");
           showToast("Sending booking request...", "success");
           try {
             const res = await fetch("./api/lessee/create_booking.php", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ machine_id: machineId, hours: hours, field_id: 1 }),
+              body: JSON.stringify({
+                machine_id: machineId,
+                hours: hours,
+                field_id: 1,
+              }),
             });
             const result = await res.json();
             if (result.success) {
-              showToast(`Booked! ${result.machine} — LKR ${parseFloat(result.total).toLocaleString()}. Waiting for lessor.`, "success");
+              showToast(
+                `Booked! ${result.machine} — LKR ${parseFloat(result.total).toLocaleString()}. Waiting for lessor.`,
+                "success",
+              );
               loadDashboardStats();
             } else {
               showToast(result.message || "Booking failed", "error");
@@ -1402,18 +1512,22 @@
             showToast("Network error. Try again.", "error");
           }
         };
-        document.getElementById("modal-cancel").onclick = () => modal.classList.add("hidden");
+        document.getElementById("modal-cancel").onclick = () =>
+          modal.classList.add("hidden");
       }
 
       // ── ACTIVE BOOKINGS ─────────────────────────────────────────
       async function loadActiveBookings() {
         const list = document.getElementById("bookings-list");
-        list.innerHTML = '<p class="text-center py-10 font-bold text-slate-400 animate-pulse">Scanning deployments...</p>';
+        list.innerHTML =
+          '<p class="text-center py-10 font-bold text-slate-400 animate-pulse">Scanning deployments...</p>';
         try {
           const res = await fetch(`./api/lessee/get_bookings.php`);
           const result = await res.json();
           if (result.success && result.data.length > 0) {
-            list.innerHTML = result.data.map((b) => `
+            list.innerHTML = result.data
+              .map(
+                (b) => `
               <div class="glass-card p-6 rounded-3xl flex flex-col md:flex-row gap-6 items-center fade-in-up">
                 <div class="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                   <span class="material-symbols-outlined text-3xl">agriculture</span>
@@ -1429,18 +1543,26 @@
                     </div>
                     <div class="flex flex-col items-end gap-2">
                       <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase border tracking-widest
-                        ${b.status === 'Pending' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-blue-50 text-blue-600 border-blue-100'}">${b.status}</span>
-                      ${b.status === 'Pending' ? `<button onclick="cancelBooking(${b.id})"
-                        class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-all">Cancel</button>` : ''}
+                        ${b.status === "Pending" ? "bg-amber-50 text-amber-600 border-amber-100" : "bg-blue-50 text-blue-600 border-blue-100"}">${b.status}</span>
+                      ${
+                        b.status === "Pending"
+                          ? `<button onclick="cancelBooking(${b.id})"
+                        class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-all">Cancel</button>`
+                          : ""
+                      }
                     </div>
                   </div>
                 </div>
-              </div>`).join("");
+              </div>`,
+              )
+              .join("");
           } else {
-            list.innerHTML = '<div class="text-center py-20"><p class="text-slate-400 font-bold">No active or pending bookings found.</p></div>';
+            list.innerHTML =
+              '<div class="text-center py-20"><p class="text-slate-400 font-bold">No active or pending bookings found.</p></div>';
           }
         } catch (e) {
-          list.innerHTML = '<p class="text-center text-red-400 font-bold py-10">Failed to load deployments.</p>';
+          list.innerHTML =
+            '<p class="text-center text-red-400 font-bold py-10">Failed to load deployments.</p>';
         }
       }
 
@@ -1448,7 +1570,8 @@
         if (!confirm("Cancel this booking?")) return;
         try {
           const res = await fetch("./api/lessee/cancel_booking.php", {
-            method: "POST", headers: { "Content-Type": "application/json" },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ booking_id: bookingId }),
           });
           const result = await res.json();
@@ -1457,21 +1580,26 @@
             loadActiveBookings();
             loadDashboardStats();
           } else showToast(result.message, "error");
-        } catch (e) { showToast("Network error", "error"); }
+        } catch (e) {
+          showToast("Network error", "error");
+        }
       }
 
       // ── RENTAL HISTORY ──────────────────────────────────────────
       async function loadRentalHistory() {
         const list = document.getElementById("history-list");
-        list.innerHTML = '<p class="text-center py-10 font-bold text-slate-400 animate-pulse">Retrieving history...</p>';
+        list.innerHTML =
+          '<p class="text-center py-10 font-bold text-slate-400 animate-pulse">Retrieving history...</p>';
         try {
           const res = await fetch(`./api/lessee/get_history.php`);
           const result = await res.json();
           if (result.success && result.data.length > 0) {
-            list.innerHTML = result.data.map((h) => `
+            list.innerHTML = result.data
+              .map(
+                (h) => `
               <div class="glass-card p-6 rounded-3xl flex gap-6 items-center opacity-80 hover:opacity-100 transition-all fade-in-up">
-                <div class="size-14 rounded-2xl ${h.status === 'Completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'} flex items-center justify-center shrink-0">
-                  <span class="material-symbols-outlined text-2xl">${h.status === 'Completed' ? 'check_circle' : 'cancel'}</span>
+                <div class="size-14 rounded-2xl ${h.status === "Completed" ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400"} flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-2xl">${h.status === "Completed" ? "check_circle" : "cancel"}</span>
                 </div>
                 <div class="flex-1">
                   <div class="flex justify-between items-center flex-wrap gap-2">
@@ -1481,27 +1609,38 @@
                     </div>
                     <div class="text-right">
                       <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">${h.created_at.split(" ")[0]}</span>
-                      <p class="text-sm font-black ${h.status === 'Completed' ? 'text-primary' : 'text-slate-400'} mt-1">
-                        ${h.status === 'Completed' ? 'LKR ' + parseFloat(h.total_amount).toLocaleString() : 'Cancelled'}
+                      <p class="text-sm font-black ${h.status === "Completed" ? "text-primary" : "text-slate-400"} mt-1">
+                        ${h.status === "Completed" ? "LKR " + parseFloat(h.total_amount).toLocaleString() : "Cancelled"}
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>`).join("");
+              </div>`,
+              )
+              .join("");
           } else {
-            list.innerHTML = '<div class="text-center py-20"><p class="text-slate-400 font-bold">No completed rentals found.</p></div>';
+            list.innerHTML =
+              '<div class="text-center py-20"><p class="text-slate-400 font-bold">No completed rentals found.</p></div>';
           }
         } catch (e) {
-          list.innerHTML = '<p class="text-center text-red-400 font-bold py-10">Network error while fetching history.</p>';
+          list.innerHTML =
+            '<p class="text-center text-red-400 font-bold py-10">Network error while fetching history.</p>';
         }
       }
 
       function lookupAddress() {}
-      function openManualFieldModal() { document.getElementById("manual-field-modal").classList.remove("hidden"); }
-      function closeManualFieldModal() { document.getElementById("manual-field-modal").classList.add("hidden"); }
+      function openManualFieldModal() {
+        document
+          .getElementById("manual-field-modal")
+          .classList.remove("hidden");
+      }
+      function closeManualFieldModal() {
+        document.getElementById("manual-field-modal").classList.add("hidden");
+      }
       function recenterFieldMap() {}
-      function checkPhoneBeforeNIC() { document.getElementById("nic-upload").click(); }
+      function checkPhoneBeforeNIC() {
+        document.getElementById("nic-upload").click();
+      }
     </script>
-
   </body>
 </html>

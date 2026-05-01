@@ -1,533 +1,1305 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>AgriLease | Owner Command Portal</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
     <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#2d6c50", "primary-dark": "#1a4332", "accent": "#f59e0b",
-                        "background-light": "#f8fafc", "background-dark": "#151d19",
-                        "sidebar-navy": "#070a09", "industrial-orange": "#F4A261",
-                    },
-                    fontFamily: { "display": ["Manrope", "sans-serif"] },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
-                },
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2d6c50",
+              "primary-dark": "#1a4332",
+              accent: "#f59e0b",
+              "background-light": "#f8fafc",
+              "background-dark": "#151d19",
+              "sidebar-navy": "#070a09",
+              "industrial-orange": "#F4A261",
             },
-        }
+            fontFamily: { display: ["Manrope", "sans-serif"] },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              "2xl": "1rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
     <style>
-        body { font-family: 'Manrope', sans-serif; background-color: #f1f5f9; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); transition: all .4s cubic-bezier(.22,1,.36,1); }
-        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(45,108,80,.1); border-color: rgba(45,108,80,.2); }
-        .fade-in-up { opacity: 0; animation: fadeInUp .6s cubic-bezier(.22,1,.36,1) forwards; }
-        .delay-100 { animation-delay: 100ms; } .delay-200 { animation-delay: 200ms; } .delay-300 { animation-delay: 300ms; }
-        @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-        .btn-gradient { background: linear-gradient(135deg,#2d6c50 0%,#1a4332 100%); transition: all .3s ease; }
-        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(45,108,80,.4); }
-        .sidebar-active { background: linear-gradient(90deg,rgba(45,108,80,.2) 0%,transparent 100%); border-left: 4px solid #2d6c50; color: white !important; }
-        .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeInUp .4s ease forwards; }
-        .input-glass { width:100%; padding:.8rem 1rem; background:rgba(255,255,255,.5); border:1px solid rgba(0,0,0,.1); border-radius:.75rem; outline:none; color:#0f172a; font-weight:600; font-size:.875rem; transition:all .3s ease; }
-        .input-glass:focus { border-color:#2d6c50; background:#fff; box-shadow:0 0 0 4px rgba(45,108,80,.1); }
-        /* Toast */
-        #toast { position:fixed; bottom:2rem; right:2rem; z-index:9999; transition:all .4s ease; transform:translateY(100px); opacity:0; }
-        #toast.show { transform:translateY(0); opacity:1; }
-        .spinner { border:3px solid rgba(45,108,80,.2); border-top-color:#2d6c50; border-radius:50%; width:20px; height:20px; animation:spin .8s linear infinite; display:inline-block; }
-        @keyframes spin { to { transform:rotate(360deg); } }
+      body {
+        font-family: "Manrope", sans-serif;
+        background-color: #f1f5f9;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 600,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(45, 108, 80, 0.1);
+        border-color: rgba(45, 108, 80, 0.2);
+      }
+      .fade-in-up {
+        opacity: 0;
+        animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .delay-100 {
+        animation-delay: 100ms;
+      }
+      .delay-200 {
+        animation-delay: 200ms;
+      }
+      .delay-300 {
+        animation-delay: 300ms;
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .btn-gradient {
+        background: linear-gradient(135deg, #2d6c50 0%, #1a4332 100%);
+        transition: all 0.3s ease;
+      }
+      .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(45, 108, 80, 0.4);
+      }
+      .sidebar-active {
+        background: linear-gradient(
+          90deg,
+          rgba(45, 108, 80, 0.2) 0%,
+          transparent 100%
+        );
+        border-left: 4px solid #2d6c50;
+        color: white !important;
+      }
+      .view-section {
+        display: none;
+      }
+      .view-section.active {
+        display: block;
+        animation: fadeInUp 0.4s ease forwards;
+      }
+      .input-glass {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.75rem;
+        outline: none;
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+      }
+      .input-glass:focus {
+        border-color: #2d6c50;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(45, 108, 80, 0.1);
+      }
+      /* Toast */
+      #toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 9999;
+        transition: all 0.4s ease;
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      #toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .spinner {
+        border: 3px solid rgba(45, 108, 80, 0.2);
+        border-top-color: #2d6c50;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
-</head>
-<body class="text-slate-900 antialiased font-display bg-gradient-to-br from-slate-50 to-slate-200">
+  </head>
+  <body
+    class="text-slate-900 antialiased font-display bg-gradient-to-br from-slate-50 to-slate-200"
+  >
+    <!-- TOAST NOTIFICATION -->
+    <div
+      id="toast"
+      class="glass-card px-5 py-3 rounded-xl flex items-center gap-3 shadow-xl border"
+    >
+      <span id="toast-icon" class="material-symbols-outlined text-primary"
+        >check_circle</span
+      >
+      <span id="toast-msg" class="text-sm font-bold text-slate-700"></span>
+    </div>
 
-<!-- TOAST NOTIFICATION -->
-<div id="toast" class="glass-card px-5 py-3 rounded-xl flex items-center gap-3 shadow-xl border">
-    <span id="toast-icon" class="material-symbols-outlined text-primary">check_circle</span>
-    <span id="toast-msg" class="text-sm font-bold text-slate-700"></span>
-</div>
-
-<div class="flex h-screen overflow-hidden">
-    <!-- SIDEBAR -->
-    <aside class="w-64 bg-sidebar-navy flex-shrink-0 flex flex-col shadow-2xl z-20 hidden md:flex">
+    <div class="flex h-screen overflow-hidden">
+      <!-- SIDEBAR -->
+      <aside
+        class="w-64 bg-sidebar-navy flex-shrink-0 flex flex-col shadow-2xl z-20 hidden md:flex"
+      >
         <div class="p-6 flex items-center gap-3 border-b border-white/5">
-            <span class="material-symbols-outlined text-green-500 text-4xl" style="font-variation-settings:'FILL' 1">agriculture</span>
-            <div>
-                <h1 class="text-white font-extrabold text-xl tracking-tight leading-none">Agri<span class="text-green-500">Lease</span></h1>
-                <p class="text-[10px] text-green-500/70 font-bold uppercase tracking-widest mt-1">Lessor Portal</p>
-            </div>
+          <span
+            class="material-symbols-outlined text-green-500 text-4xl"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >agriculture</span
+          >
+          <div>
+            <h1
+              class="text-white font-extrabold text-xl tracking-tight leading-none"
+            >
+              Agri<span class="text-green-500">Lease</span>
+            </h1>
+            <p
+              class="text-[10px] text-green-500/70 font-bold uppercase tracking-widest mt-1"
+            >
+              Lessor Portal
+            </p>
+          </div>
         </div>
         <nav class="mt-4 flex-1 overflow-y-auto py-4">
-            <div class="px-6 mb-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Management</div>
-            <a href="#" onclick="switchView('dashboard',this,'Dashboard Overview','Welcome back, here is what\'s happening with your fleet today.')" class="nav-btn sidebar-active flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 transition-all duration-300">
-                <span class="material-symbols-outlined">dashboard</span><span class="text-sm font-bold">Dashboard</span>
-            </a>
-            <a href="#" onclick="switchView('fleet',this,'Fleet Management','Manage your registered machinery and assets.')" class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
-                <span class="material-symbols-outlined group-hover:text-primary transition-colors">traffic</span><span class="text-sm font-medium">Fleet</span>
-            </a>
-            <a href="#" onclick="switchView('bookings',this,'Booking Schedule','Track your upcoming rentals and availability.')" class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
-                <span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_month</span><span class="text-sm font-medium">Bookings</span>
-            </a>
-            <a href="#" onclick="switchView('earnings',this,'Revenue & Earnings','Track payouts and financial performance.')" class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
-                <span class="material-symbols-outlined group-hover:text-primary transition-colors">payments</span><span class="text-sm font-medium">Earnings</span>
-            </a>
-            <a href="#" onclick="switchView('maintenance',this,'Maintenance Logs','Track servicing and repairs for your fleet.')" class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
-                <span class="material-symbols-outlined group-hover:text-industrial-orange transition-colors">build</span><span class="text-sm font-medium">Maintenance Logs</span>
-            </a>
-            <div class="px-6 mt-8 mb-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Account</div>
-            <a href="#" onclick="switchView('settings',this,'Account Settings','Manage your profile and preferences.')" class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group">
-                <span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span><span class="text-sm font-medium">Settings</span>
-            </a>
+          <div
+            class="px-6 mb-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+          >
+            Management
+          </div>
+          <a
+            href="#"
+            onclick="
+              switchView(
+                'dashboard',
+                this,
+                'Dashboard Overview',
+                'Welcome back, here is what\'s happening with your fleet today.',
+              )
+            "
+            class="nav-btn sidebar-active flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 transition-all duration-300"
+          >
+            <span class="material-symbols-outlined">dashboard</span
+            ><span class="text-sm font-bold">Dashboard</span>
+          </a>
+          <a
+            href="#"
+            onclick="
+              switchView(
+                'fleet',
+                this,
+                'Fleet Management',
+                'Manage your registered machinery and assets.',
+              )
+            "
+            class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group"
+          >
+            <span
+              class="material-symbols-outlined group-hover:text-primary transition-colors"
+              >traffic</span
+            ><span class="text-sm font-medium">Fleet</span>
+          </a>
+          <a
+            href="#"
+            onclick="
+              switchView(
+                'bookings',
+                this,
+                'Booking Schedule',
+                'Track your upcoming rentals and availability.',
+              )
+            "
+            class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group"
+          >
+            <span
+              class="material-symbols-outlined group-hover:text-primary transition-colors"
+              >calendar_month</span
+            ><span class="text-sm font-medium">Bookings</span>
+          </a>
+          <a
+            href="#"
+            onclick="
+              switchView(
+                'earnings',
+                this,
+                'Revenue & Earnings',
+                'Track payouts and financial performance.',
+              )
+            "
+            class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group"
+          >
+            <span
+              class="material-symbols-outlined group-hover:text-primary transition-colors"
+              >payments</span
+            ><span class="text-sm font-medium">Earnings</span>
+          </a>
+          <a
+            href="#"
+            onclick="
+              switchView(
+                'maintenance',
+                this,
+                'Maintenance Logs',
+                'Track servicing and repairs for your fleet.',
+              )
+            "
+            class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group"
+          >
+            <span
+              class="material-symbols-outlined group-hover:text-industrial-orange transition-colors"
+              >build</span
+            ><span class="text-sm font-medium">Maintenance Logs</span>
+          </a>
+          <div
+            class="px-6 mt-8 mb-2 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+          >
+            Account
+          </div>
+          <a
+            href="#"
+            onclick="
+              switchView(
+                'settings',
+                this,
+                'Account Settings',
+                'Manage your profile and preferences.',
+              )
+            "
+            class="nav-btn flex items-center gap-4 px-6 py-3.5 text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-300 group"
+          >
+            <span
+              class="material-symbols-outlined group-hover:text-primary transition-colors"
+              >settings</span
+            ><span class="text-sm font-medium">Settings</span>
+          </a>
         </nav>
         <div class="p-6 border-t border-white/5 bg-black/20">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="size-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold shadow-inner">
-                    <span id="sidebar-initials">--</span>
-                </div>
-                <div class="overflow-hidden">
-                    <p id="sidebar-name" class="text-sm font-extrabold text-white truncate">Loading...</p>
-                    <p class="text-xs text-slate-400 font-mono">Premium Lessor</p>
-                </div>
+          <div class="flex items-center gap-3 mb-4">
+            <div
+              class="size-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold shadow-inner"
+            >
+              <span id="sidebar-initials">--</span>
             </div>
-            <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-bold text-slate-300 bg-white/5 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-all border border-transparent hover:border-red-500/30">
-                <span class="material-symbols-outlined text-sm">logout</span> Secure Logout
-            </button>
+            <div class="overflow-hidden">
+              <p
+                id="sidebar-name"
+                class="text-sm font-extrabold text-white truncate"
+              >
+                Loading...
+              </p>
+              <p class="text-xs text-slate-400 font-mono">Premium Lessor</p>
+            </div>
+          </div>
+          <button
+            onclick="logout()"
+            class="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-bold text-slate-300 bg-white/5 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-all border border-transparent hover:border-red-500/30"
+          >
+            <span class="material-symbols-outlined text-sm">logout</span> Secure
+            Logout
+          </button>
         </div>
-    </aside>
+      </aside>
 
-    <!-- MAIN -->
-    <main class="flex-1 overflow-y-auto relative pb-12">
-        <header class="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200 px-8 py-5 flex items-center justify-between shadow-sm">
-            <div class="flex-1 hidden md:block">
-                <h2 id="header-title" class="text-2xl font-extrabold text-slate-800 tracking-tight">Dashboard Overview</h2>
-                <p id="header-subtitle" class="text-sm font-medium text-slate-500">Welcome back, here is what's happening with your fleet today.</p>
+      <!-- MAIN -->
+      <main class="flex-1 overflow-y-auto relative pb-12">
+        <header
+          class="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-slate-200 px-8 py-5 flex items-center justify-between shadow-sm"
+        >
+          <div class="flex-1 hidden md:block">
+            <h2
+              id="header-title"
+              class="text-2xl font-extrabold text-slate-800 tracking-tight"
+            >
+              Dashboard Overview
+            </h2>
+            <p id="header-subtitle" class="text-sm font-medium text-slate-500">
+              Welcome back, here is what's happening with your fleet today.
+            </p>
+          </div>
+          <div
+            class="flex items-center justify-center flex-1 max-w-2xl w-full mx-auto"
+          >
+            <div class="relative w-full group">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                >search</span
+              >
+              <input
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-100/80 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                placeholder="Search fleet, bookings..."
+                type="text"
+                id="global-search"
+              />
             </div>
-            <div class="flex items-center justify-center flex-1 max-w-2xl w-full mx-auto">
-                <div class="relative w-full group">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                    <input class="w-full pl-10 pr-4 py-2.5 bg-slate-100/80 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Search fleet, bookings..." type="text" id="global-search" />
-                </div>
-            </div>
-            <div class="flex-1 flex justify-end items-center gap-4">
-                <button class="size-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 hover:border-primary hover:text-primary transition-all shadow-sm relative">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span id="notif-dot" class="absolute top-2 right-2 size-2.5 bg-red-500 rounded-full border-2 border-white hidden"></span>
-                </button>
-            </div>
+          </div>
+          <div class="flex-1 flex justify-end items-center gap-4">
+            <button
+              class="size-11 flex items-center justify-center rounded-xl bg-white border border-slate-200 hover:border-primary hover:text-primary transition-all shadow-sm relative"
+            >
+              <span class="material-symbols-outlined">notifications</span>
+              <span
+                id="notif-dot"
+                class="absolute top-2 right-2 size-2.5 bg-red-500 rounded-full border-2 border-white hidden"
+              ></span>
+            </button>
+          </div>
         </header>
 
         <div class="px-8 mt-8 max-w-7xl mx-auto">
-
-            <!-- DASHBOARD VIEW -->
-            <div id="view-dashboard" class="view-section active space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-card p-6 rounded-2xl fade-in-up">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner"><span class="material-symbols-outlined">payments</span></div>
-                        </div>
-                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Revenue</p>
-                        <h3 id="dash-revenue" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl fade-in-up delay-100">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="size-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner"><span class="material-symbols-outlined">precision_manufacturing</span></div>
-                        </div>
-                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Active Rentals</p>
-                        <h3 id="dash-rentals" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl fade-in-up delay-200">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="size-12 rounded-xl bg-industrial-orange/10 flex items-center justify-center text-industrial-orange shadow-inner"><span class="material-symbols-outlined">warning</span></div>
-                            <span class="text-[10px] font-extrabold text-industrial-orange bg-orange-50 border border-orange-100 px-2 py-1 rounded-lg">Action Required</span>
-                        </div>
-                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pending Maintenance</p>
-                        <h3 id="dash-maintenance" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3>
-                    </div>
+          <!-- DASHBOARD VIEW -->
+          <div id="view-dashboard" class="view-section active space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="glass-card p-6 rounded-2xl fade-in-up">
+                <div class="flex items-center justify-between mb-4">
+                  <div
+                    class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner"
+                  >
+                    <span class="material-symbols-outlined">payments</span>
+                  </div>
                 </div>
-                <div class="glass-card rounded-2xl overflow-hidden fade-in-up delay-300">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50">
-                        <h3 class="font-extrabold text-lg text-slate-800">My Fleet Overview</h3>
-                        <button class="text-primary text-sm font-bold hover:underline" onclick="switchView('fleet',document.querySelectorAll('.nav-btn')[1],'Fleet Management','Manage your registered machinery')">View All</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100">
-                                <tr><th class="px-6 py-4">Machine Details</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-right">Rate/hr</th></tr>
-                            </thead>
-                            <tbody id="dash-fleet-tbody" class="divide-y divide-slate-50">
-                                <tr><td colspan="3" class="px-6 py-8 text-center text-slate-400"><div class="spinner mx-auto"></div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <p
+                  class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                >
+                  Total Revenue
+                </p>
+                <h3
+                  id="dash-revenue"
+                  class="text-3xl font-extrabold text-slate-800 mt-1"
+                >
+                  <div class="spinner"></div>
+                </h3>
+              </div>
+              <div class="glass-card p-6 rounded-2xl fade-in-up delay-100">
+                <div class="flex items-center justify-between mb-4">
+                  <div
+                    class="size-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner"
+                  >
+                    <span class="material-symbols-outlined"
+                      >precision_manufacturing</span
+                    >
+                  </div>
                 </div>
+                <p
+                  class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                >
+                  Active Rentals
+                </p>
+                <h3
+                  id="dash-rentals"
+                  class="text-3xl font-extrabold text-slate-800 mt-1"
+                >
+                  <div class="spinner"></div>
+                </h3>
+              </div>
+              <div class="glass-card p-6 rounded-2xl fade-in-up delay-200">
+                <div class="flex items-center justify-between mb-4">
+                  <div
+                    class="size-12 rounded-xl bg-industrial-orange/10 flex items-center justify-center text-industrial-orange shadow-inner"
+                  >
+                    <span class="material-symbols-outlined">warning</span>
+                  </div>
+                  <span
+                    class="text-[10px] font-extrabold text-industrial-orange bg-orange-50 border border-orange-100 px-2 py-1 rounded-lg"
+                    >Action Required</span
+                  >
+                </div>
+                <p
+                  class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                >
+                  Pending Maintenance
+                </p>
+                <h3
+                  id="dash-maintenance"
+                  class="text-3xl font-extrabold text-slate-800 mt-1"
+                >
+                  <div class="spinner"></div>
+                </h3>
+              </div>
             </div>
-
-            <!-- FLEET VIEW -->
-            <div id="view-fleet" class="view-section space-y-8">
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50">
-                        <div><h3 class="font-extrabold text-lg text-slate-800">Registered Machinery</h3></div>
-                        <button class="bg-gradient-to-r from-industrial-orange to-[#e09151] hover:brightness-110 text-white px-5 py-2.5 rounded-xl font-extrabold flex items-center gap-2 shadow-sm text-sm" onclick="openAddMachineModal()">
-                            <span class="material-symbols-outlined text-lg">add_circle</span> Add Machine
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100">
-                                <tr>
-                                    <th class="px-6 py-4">Machine Details</th>
-                                    <th class="px-6 py-4">Status</th>
-                                    <th class="px-6 py-4">Total Hours</th>
-                                    <th class="px-6 py-4">Next Service</th>
-                                    <th class="px-6 py-4 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fleet-tbody" class="divide-y divide-slate-50">
-                                <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400"><div class="spinner mx-auto"></div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div
+              class="glass-card rounded-2xl overflow-hidden fade-in-up delay-300"
+            >
+              <div
+                class="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50"
+              >
+                <h3 class="font-extrabold text-lg text-slate-800">
+                  My Fleet Overview
+                </h3>
+                <button
+                  class="text-primary text-sm font-bold hover:underline"
+                  onclick="
+                    switchView(
+                      'fleet',
+                      document.querySelectorAll('.nav-btn')[1],
+                      'Fleet Management',
+                      'Manage your registered machinery',
+                    )
+                  "
+                >
+                  View All
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead
+                    class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100"
+                  >
+                    <tr>
+                      <th class="px-6 py-4">Machine Details</th>
+                      <th class="px-6 py-4">Status</th>
+                      <th class="px-6 py-4 text-right">Rate/hr</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-fleet-tbody" class="divide-y divide-slate-50">
+                    <tr>
+                      <td
+                        colspan="3"
+                        class="px-6 py-8 text-center text-slate-400"
+                      >
+                        <div class="spinner mx-auto"></div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
 
-            <!-- BOOKINGS VIEW -->
-            <div id="view-bookings" class="view-section space-y-8">
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center">
-                        <h3 class="font-extrabold text-lg text-slate-800">Booking Requests</h3>
-                        <span id="pending-badge" class="text-xs font-extrabold bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1 rounded-lg hidden">0 Pending</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100">
-                                <tr>
-                                    <th class="px-6 py-4">Machine</th>
-                                    <th class="px-6 py-4">Lessee</th>
-                                    <th class="px-6 py-4">Amount</th>
-                                    <th class="px-6 py-4">Date</th>
-                                    <th class="px-6 py-4">Status</th>
-                                    <th class="px-6 py-4 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bookings-tbody" class="divide-y divide-slate-50">
-                                <tr><td colspan="6" class="px-6 py-8 text-center text-slate-400"><div class="spinner mx-auto"></div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+          <!-- FLEET VIEW -->
+          <div id="view-fleet" class="view-section space-y-8">
+            <div class="glass-card rounded-2xl overflow-hidden">
+              <div
+                class="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50"
+              >
+                <div>
+                  <h3 class="font-extrabold text-lg text-slate-800">
+                    Registered Machinery
+                  </h3>
                 </div>
+                <button
+                  class="bg-gradient-to-r from-industrial-orange to-[#e09151] hover:brightness-110 text-white px-5 py-2.5 rounded-xl font-extrabold flex items-center gap-2 shadow-sm text-sm"
+                  onclick="openAddMachineModal()"
+                >
+                  <span class="material-symbols-outlined text-lg"
+                    >add_circle</span
+                  >
+                  Add Machine
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead
+                    class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100"
+                  >
+                    <tr>
+                      <th class="px-6 py-4">Machine Details</th>
+                      <th class="px-6 py-4">Status</th>
+                      <th class="px-6 py-4">Total Hours</th>
+                      <th class="px-6 py-4">Next Service</th>
+                      <th class="px-6 py-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="fleet-tbody" class="divide-y divide-slate-50">
+                    <tr>
+                      <td
+                        colspan="5"
+                        class="px-6 py-8 text-center text-slate-400"
+                      >
+                        <div class="spinner mx-auto"></div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
 
-            <!-- EARNINGS VIEW -->
-            <div id="view-earnings" class="view-section space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card p-6 rounded-2xl flex items-center gap-5 border-l-4 border-l-primary">
-                        <div class="size-14 bg-primary/10 rounded-full flex items-center justify-center text-primary"><span class="material-symbols-outlined text-3xl">account_balance_wallet</span></div>
-                        <div><p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Available Balance</p><h3 id="earn-available" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3></div>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl flex items-center gap-5 border-l-4 border-l-slate-300">
-                        <div class="size-14 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><span class="material-symbols-outlined text-3xl">history</span></div>
-                        <div><p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pending in Escrow</p><h3 id="earn-escrow" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3></div>
-                    </div>
-                </div>
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center">
-                        <h4 class="font-extrabold text-slate-800 text-lg">Payout History</h4>
-                        <button onclick="downloadEarningsCSV()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-50">Download CSV</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest">
-                                <tr><th class="px-6 py-4">Date</th><th class="px-6 py-4">Booking ID</th><th class="px-6 py-4">Machine</th><th class="px-6 py-4">Amount (LKR)</th><th class="px-6 py-4 text-right">Status</th></tr>
-                            </thead>
-                            <tbody id="earnings-tbody" class="divide-y divide-slate-50">
-                                <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400"><div class="spinner mx-auto"></div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+          <!-- BOOKINGS VIEW -->
+          <div id="view-bookings" class="view-section space-y-8">
+            <div class="glass-card rounded-2xl overflow-hidden">
+              <div
+                class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center"
+              >
+                <h3 class="font-extrabold text-lg text-slate-800">
+                  Booking Requests
+                </h3>
+                <span
+                  id="pending-badge"
+                  class="text-xs font-extrabold bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1 rounded-lg hidden"
+                  >0 Pending</span
+                >
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead
+                    class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest border-b border-slate-100"
+                  >
+                    <tr>
+                      <th class="px-6 py-4">Machine</th>
+                      <th class="px-6 py-4">Lessee</th>
+                      <th class="px-6 py-4">Amount</th>
+                      <th class="px-6 py-4">Date</th>
+                      <th class="px-6 py-4">Status</th>
+                      <th class="px-6 py-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bookings-tbody" class="divide-y divide-slate-50">
+                    <tr>
+                      <td
+                        colspan="6"
+                        class="px-6 py-8 text-center text-slate-400"
+                      >
+                        <div class="spinner mx-auto"></div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
 
-            <!-- MAINTENANCE VIEW -->
-            <div id="view-maintenance" class="view-section space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-industrial-orange">
-                        <div class="size-12 rounded-xl bg-orange-50 flex items-center justify-center text-industrial-orange mb-4"><span class="material-symbols-outlined">build</span></div>
-                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Active Repairs</p>
-                        <h3 id="maint-active" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500">
-                        <div class="size-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 mb-4"><span class="material-symbols-outlined">event</span></div>
-                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Scheduled Services</p>
-                        <h3 id="maint-scheduled" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-slate-400">
-                        <div class="size-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 mb-4"><span class="material-symbols-outlined">receipt_long</span></div>
-                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Cost (YTD)</p>
-                        <h3 id="maint-cost" class="text-3xl font-extrabold text-slate-800 mt-1"><div class="spinner"></div></h3>
-                    </div>
+          <!-- EARNINGS VIEW -->
+          <div id="view-earnings" class="view-section space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div
+                class="glass-card p-6 rounded-2xl flex items-center gap-5 border-l-4 border-l-primary"
+              >
+                <div
+                  class="size-14 bg-primary/10 rounded-full flex items-center justify-center text-primary"
+                >
+                  <span class="material-symbols-outlined text-3xl"
+                    >account_balance_wallet</span
+                  >
                 </div>
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center">
-                        <h4 class="font-extrabold text-slate-800 text-lg">Service History</h4>
-                        <button onclick="openLogServiceModal()" class="px-4 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark transition-colors">Log New Service</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest">
-                                <tr><th class="px-6 py-4">Date</th><th class="px-6 py-4">Machine</th><th class="px-6 py-4">Service Type</th><th class="px-6 py-4">Cost (LKR)</th><th class="px-6 py-4 text-right">Status</th></tr>
-                            </thead>
-                            <tbody id="maintenance-tbody" class="divide-y divide-slate-50">
-                                <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400"><div class="spinner mx-auto"></div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div>
+                  <p
+                    class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                  >
+                    Available Balance
+                  </p>
+                  <h3
+                    id="earn-available"
+                    class="text-3xl font-extrabold text-slate-800 mt-1"
+                  >
+                    <div class="spinner"></div>
+                  </h3>
                 </div>
+              </div>
+              <div
+                class="glass-card p-6 rounded-2xl flex items-center gap-5 border-l-4 border-l-slate-300"
+              >
+                <div
+                  class="size-14 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"
+                >
+                  <span class="material-symbols-outlined text-3xl"
+                    >history</span
+                  >
+                </div>
+                <div>
+                  <p
+                    class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                  >
+                    Pending in Escrow
+                  </p>
+                  <h3
+                    id="earn-escrow"
+                    class="text-3xl font-extrabold text-slate-800 mt-1"
+                  >
+                    <div class="spinner"></div>
+                  </h3>
+                </div>
+              </div>
             </div>
-
-            <!-- SETTINGS VIEW -->
-            <div id="view-settings" class="view-section">
-                <div class="max-w-3xl mx-auto glass-card rounded-2xl p-8 shadow-sm">
-                    <h3 class="text-2xl font-extrabold text-slate-800 mb-6 border-b border-slate-100 pb-4">Owner Profile Settings</h3>
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-4">Contact Information</h4>
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 mb-2">Full Name</label>
-                                    <input type="text" id="settings-name" class="input-glass" placeholder="Loading..." />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 mb-2">Phone Number</label>
-                                    <input type="text" id="settings-phone" class="input-glass" placeholder="+94 77 ..." />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 mb-2">District</label>
-                                    <input type="text" id="settings-district" class="input-glass" placeholder="e.g. Anuradhapura" />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 mb-2">Email (read-only)</label>
-                                    <input type="text" id="settings-email" class="input-glass opacity-60" readonly />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pt-6 border-t border-slate-100">
-                            <h4 class="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-4">Change Password</h4>
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-600 mb-2">New Password</label>
-                                    <input type="password" id="settings-password" class="input-glass" placeholder="Leave blank to keep current" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pt-6 border-t border-slate-100 flex justify-end gap-3">
-                            <button onclick="loadSettings()" class="px-6 py-3 bg-white border border-slate-200 rounded-xl text-sm font-extrabold text-slate-600 hover:bg-slate-50">Discard</button>
-                            <button onclick="saveSettings()" class="px-6 py-3 btn-gradient text-white rounded-xl text-sm font-extrabold shadow-lg shadow-primary/30">Save Changes</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="glass-card rounded-2xl overflow-hidden">
+              <div
+                class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center"
+              >
+                <h4 class="font-extrabold text-slate-800 text-lg">
+                  Payout History
+                </h4>
+                <button
+                  onclick="downloadEarningsCSV()"
+                  class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-50"
+                >
+                  Download CSV
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead
+                    class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest"
+                  >
+                    <tr>
+                      <th class="px-6 py-4">Date</th>
+                      <th class="px-6 py-4">Booking ID</th>
+                      <th class="px-6 py-4">Machine</th>
+                      <th class="px-6 py-4">Amount (LKR)</th>
+                      <th class="px-6 py-4 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="earnings-tbody" class="divide-y divide-slate-50">
+                    <tr>
+                      <td
+                        colspan="5"
+                        class="px-6 py-8 text-center text-slate-400"
+                      >
+                        <div class="spinner mx-auto"></div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
 
-        </div><!-- end px-8 -->
-    </main>
-</div>
+          <!-- MAINTENANCE VIEW -->
+          <div id="view-maintenance" class="view-section space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div
+                class="glass-card p-6 rounded-2xl border-l-4 border-l-industrial-orange"
+              >
+                <div
+                  class="size-12 rounded-xl bg-orange-50 flex items-center justify-center text-industrial-orange mb-4"
+                >
+                  <span class="material-symbols-outlined">build</span>
+                </div>
+                <p
+                  class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                >
+                  Active Repairs
+                </p>
+                <h3
+                  id="maint-active"
+                  class="text-3xl font-extrabold text-slate-800 mt-1"
+                >
+                  <div class="spinner"></div>
+                </h3>
+              </div>
+              <div
+                class="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500"
+              >
+                <div
+                  class="size-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 mb-4"
+                >
+                  <span class="material-symbols-outlined">event</span>
+                </div>
+                <p
+                  class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                >
+                  Scheduled Services
+                </p>
+                <h3
+                  id="maint-scheduled"
+                  class="text-3xl font-extrabold text-slate-800 mt-1"
+                >
+                  <div class="spinner"></div>
+                </h3>
+              </div>
+              <div
+                class="glass-card p-6 rounded-2xl border-l-4 border-l-slate-400"
+              >
+                <div
+                  class="size-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 mb-4"
+                >
+                  <span class="material-symbols-outlined">receipt_long</span>
+                </div>
+                <p
+                  class="text-xs font-extrabold text-slate-400 uppercase tracking-wider"
+                >
+                  Total Cost (YTD)
+                </p>
+                <h3
+                  id="maint-cost"
+                  class="text-3xl font-extrabold text-slate-800 mt-1"
+                >
+                  <div class="spinner"></div>
+                </h3>
+              </div>
+            </div>
+            <div class="glass-card rounded-2xl overflow-hidden">
+              <div
+                class="p-6 border-b border-slate-100 bg-white/50 flex justify-between items-center"
+              >
+                <h4 class="font-extrabold text-slate-800 text-lg">
+                  Service History
+                </h4>
+                <button
+                  onclick="openLogServiceModal()"
+                  class="px-4 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark transition-colors"
+                >
+                  Log New Service
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead
+                    class="bg-slate-50/80 text-[10px] uppercase text-slate-400 font-extrabold tracking-widest"
+                  >
+                    <tr>
+                      <th class="px-6 py-4">Date</th>
+                      <th class="px-6 py-4">Machine</th>
+                      <th class="px-6 py-4">Service Type</th>
+                      <th class="px-6 py-4">Cost (LKR)</th>
+                      <th class="px-6 py-4 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="maintenance-tbody"
+                    class="divide-y divide-slate-50"
+                  >
+                    <tr>
+                      <td
+                        colspan="5"
+                        class="px-6 py-8 text-center text-slate-400"
+                      >
+                        <div class="spinner mx-auto"></div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
 
-<!-- ADD MACHINE MODAL -->
-<div id="modal-add-machine" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
-    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
-        <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <h3 id="machine-modal-title" class="text-xl font-extrabold text-slate-800">Register New Machine</h3>
-            <button onclick="closeMachineModal()" class="text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-lg shadow-sm border border-slate-200"><span class="material-symbols-outlined text-sm">close</span></button>
+          <!-- SETTINGS VIEW -->
+          <div id="view-settings" class="view-section">
+            <div class="max-w-3xl mx-auto glass-card rounded-2xl p-8 shadow-sm">
+              <h3
+                class="text-2xl font-extrabold text-slate-800 mb-6 border-b border-slate-100 pb-4"
+              >
+                Owner Profile Settings
+              </h3>
+              <div class="space-y-6">
+                <div>
+                  <h4
+                    class="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-4"
+                  >
+                    Contact Information
+                  </h4>
+                  <div class="grid grid-cols-2 gap-6">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-2"
+                        >Full Name</label
+                      >
+                      <input
+                        type="text"
+                        id="settings-name"
+                        class="input-glass"
+                        placeholder="Loading..."
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-2"
+                        >Phone Number</label
+                      >
+                      <input
+                        type="text"
+                        id="settings-phone"
+                        class="input-glass"
+                        placeholder="+94 77 ..."
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-2"
+                        >District</label
+                      >
+                      <input
+                        type="text"
+                        id="settings-district"
+                        class="input-glass"
+                        placeholder="e.g. Anuradhapura"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-2"
+                        >Email (read-only)</label
+                      >
+                      <input
+                        type="text"
+                        id="settings-email"
+                        class="input-glass opacity-60"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="pt-6 border-t border-slate-100">
+                  <h4
+                    class="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-4"
+                  >
+                    Change Password
+                  </h4>
+                  <div class="grid grid-cols-2 gap-6">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-2"
+                        >New Password</label
+                      >
+                      <input
+                        type="password"
+                        id="settings-password"
+                        class="input-glass"
+                        placeholder="Leave blank to keep current"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="pt-6 border-t border-slate-100 flex justify-end gap-3"
+                >
+                  <button
+                    onclick="loadSettings()"
+                    class="px-6 py-3 bg-white border border-slate-200 rounded-xl text-sm font-extrabold text-slate-600 hover:bg-slate-50"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    onclick="saveSettings()"
+                    class="px-6 py-3 btn-gradient text-white rounded-xl text-sm font-extrabold shadow-lg shadow-primary/30"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end px-8 -->
+      </main>
+    </div>
+
+    <!-- ADD MACHINE MODAL -->
+    <div
+      id="modal-add-machine"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-100"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50"
+        >
+          <h3
+            id="machine-modal-title"
+            class="text-xl font-extrabold text-slate-800"
+          >
+            Register New Machine
+          </h3>
+          <button
+            onclick="closeMachineModal()"
+            class="text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-lg shadow-sm border border-slate-200"
+          >
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
         </div>
         <div class="p-8 space-y-5">
-            <input type="hidden" id="machine-id" value="" />
-            <div class="grid grid-cols-2 gap-5">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Category</label>
-                    <select id="machine-category" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 focus:ring-primary focus:border-primary">
-                        <option>Tractor</option><option>Harvester</option><option>Pump</option><option>Other</option>
-                    </select>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Model Name</label>
-                    <input id="machine-model" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" placeholder="e.g. TAFE 45DI" type="text" />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Serial Number</label>
-                    <input id="machine-serial" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" placeholder="e.g. MF-101" type="text" />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Hourly Rate (LKR)</label>
-                    <input id="machine-rate" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" placeholder="e.g. 5000" type="number" />
-                </div>
-                <div class="space-y-2" id="machine-status-group" style="display:none">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Status</label>
-                    <select id="machine-status" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700">
-                        <option>Available</option><option>Rented</option><option>Maintenance</option>
-                    </select>
-                </div>
-                <div class="space-y-2" id="machine-hours-group" style="display:none">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Total Hours</label>
-                    <input id="machine-hours" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" type="number" value="0" />
-                </div>
-                <div class="space-y-2 col-span-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Next Service Date</label>
-                    <input id="machine-service-date" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" type="date" />
-                </div>
-                <div class="space-y-2 col-span-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Image URL (optional)</label>
-                    <input id="machine-image" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" type="text" placeholder="https://images.unsplash.com/..." />
-                </div>
+          <input type="hidden" id="machine-id" value="" />
+          <div class="grid grid-cols-2 gap-5">
+            <div class="space-y-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Category</label
+              >
+              <select
+                id="machine-category"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 focus:ring-primary focus:border-primary"
+              >
+                <option>Tractor</option>
+                <option>Harvester</option>
+                <option>Pump</option>
+                <option>Other</option>
+              </select>
             </div>
             <div class="space-y-2">
-                <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Description</label>
-                <textarea id="machine-description" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 resize-none" rows="3" placeholder="Horsepower, fuel capacity, attachments..."></textarea>
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Model Name</label
+              >
+              <input
+                id="machine-model"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                placeholder="e.g. TAFE 45DI"
+                type="text"
+              />
             </div>
-            <div class="flex gap-4 pt-4 border-t border-slate-100">
-                <button onclick="closeMachineModal()" class="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 font-extrabold py-3.5 rounded-xl text-sm">Cancel</button>
-                <button id="machine-submit-btn" onclick="submitMachine()" class="flex-1 btn-gradient text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-primary/30 text-sm">Submit Registration</button>
+            <div class="space-y-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Serial Number</label
+              >
+              <input
+                id="machine-serial"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                placeholder="e.g. MF-101"
+                type="text"
+              />
             </div>
+            <div class="space-y-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Hourly Rate (LKR)</label
+              >
+              <input
+                id="machine-rate"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                placeholder="e.g. 5000"
+                type="number"
+              />
+            </div>
+            <div
+              class="space-y-2"
+              id="machine-status-group"
+              style="display: none"
+            >
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Status</label
+              >
+              <select
+                id="machine-status"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+              >
+                <option>Available</option>
+                <option>Rented</option>
+                <option>Maintenance</option>
+              </select>
+            </div>
+            <div
+              class="space-y-2"
+              id="machine-hours-group"
+              style="display: none"
+            >
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Total Hours</label
+              >
+              <input
+                id="machine-hours"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                type="number"
+                value="0"
+              />
+            </div>
+            <div class="space-y-2 col-span-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Next Service Date</label
+              >
+              <input
+                id="machine-service-date"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                type="date"
+              />
+            </div>
+            <div class="space-y-2 col-span-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Image URL (optional)</label
+              >
+              <input
+                id="machine-image"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                type="text"
+                placeholder="https://images.unsplash.com/..."
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label
+              class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+              >Description</label
+            >
+            <textarea
+              id="machine-description"
+              class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 resize-none"
+              rows="3"
+              placeholder="Horsepower, fuel capacity, attachments..."
+            ></textarea>
+          </div>
+          <div class="flex gap-4 pt-4 border-t border-slate-100">
+            <button
+              onclick="closeMachineModal()"
+              class="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 font-extrabold py-3.5 rounded-xl text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              id="machine-submit-btn"
+              onclick="submitMachine()"
+              class="flex-1 btn-gradient text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-primary/30 text-sm"
+            >
+              Submit Registration
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- LOG SERVICE MODAL -->
-<div id="modal-log-service" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
-    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
-        <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <h3 class="text-xl font-extrabold text-slate-800">Log New Service</h3>
-            <button onclick="document.getElementById('modal-log-service').style.display='none'" class="text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-lg shadow-sm border border-slate-200"><span class="material-symbols-outlined text-sm">close</span></button>
+    <!-- LOG SERVICE MODAL -->
+    <div
+      id="modal-log-service"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4"
+      style="display: none"
+    >
+      <div
+        class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-100"
+      >
+        <div
+          class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50"
+        >
+          <h3 class="text-xl font-extrabold text-slate-800">Log New Service</h3>
+          <button
+            onclick="
+              document.getElementById('modal-log-service').style.display =
+                'none'
+            "
+            class="text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-lg shadow-sm border border-slate-200"
+          >
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
         </div>
         <div class="p-8 space-y-5">
+          <div class="space-y-2">
+            <label
+              class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+              >Machine</label
+            >
+            <select
+              id="service-machine-id"
+              class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+            >
+              <option value="">Select machine...</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-5">
             <div class="space-y-2">
-                <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Machine</label>
-                <select id="service-machine-id" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700">
-                    <option value="">Select machine...</option>
-                </select>
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Service Type</label
+              >
+              <input
+                id="service-type"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                placeholder="e.g. Oil Change"
+                type="text"
+              />
             </div>
-            <div class="grid grid-cols-2 gap-5">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Service Type</label>
-                    <input id="service-type" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" placeholder="e.g. Oil Change" type="text" />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Cost (LKR)</label>
-                    <input id="service-cost" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" type="number" placeholder="e.g. 15000" />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Service Date</label>
-                    <input id="service-date" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700" type="date" />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Status</label>
-                    <select id="service-status" class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700">
-                        <option>Completed</option><option>Scheduled</option><option>Overdue</option>
-                    </select>
-                </div>
+            <div class="space-y-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Cost (LKR)</label
+              >
+              <input
+                id="service-cost"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                type="number"
+                placeholder="e.g. 15000"
+              />
             </div>
-            <div class="flex gap-4 pt-4 border-t border-slate-100">
-                <button onclick="document.getElementById('modal-log-service').style.display='none'" class="flex-1 bg-white border border-slate-200 text-slate-500 font-extrabold py-3.5 rounded-xl text-sm">Cancel</button>
-                <button onclick="submitService()" class="flex-1 btn-gradient text-white font-extrabold py-3.5 rounded-xl shadow-lg text-sm">Save Log</button>
+            <div class="space-y-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Service Date</label
+              >
+              <input
+                id="service-date"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+                type="date"
+              />
             </div>
+            <div class="space-y-2">
+              <label
+                class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest"
+                >Status</label
+              >
+              <select
+                id="service-status"
+                class="w-full bg-slate-50 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700"
+              >
+                <option>Completed</option>
+                <option>Scheduled</option>
+                <option>Overdue</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex gap-4 pt-4 border-t border-slate-100">
+            <button
+              onclick="
+                document.getElementById('modal-log-service').style.display =
+                  'none'
+              "
+              class="flex-1 bg-white border border-slate-200 text-slate-500 font-extrabold py-3.5 rounded-xl text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onclick="submitService()"
+              class="flex-1 btn-gradient text-white font-extrabold py-3.5 rounded-xl shadow-lg text-sm"
+            >
+              Save Log
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<script>
-    // ── CONFIG ──────────────────────────────────────────────────────────
-    const API = 'api/lessor';
+    <script>
+      const _u = JSON.parse(localStorage.getItem("agrilease_user") || "null");
+      if (!_u || _u.role !== "Lessor") window.location.replace("login.html");
+      // ── CONFIG ──────────────────────────────────────────────────────────
+      const API = "api/lessor";
 
-    // ── UTILITY ─────────────────────────────────────────────────────────
-    function toast(msg, isError = false) {
-        const t = document.getElementById('toast');
-        document.getElementById('toast-msg').textContent = msg;
-        const icon = document.getElementById('toast-icon');
-        icon.textContent = isError ? 'error' : 'check_circle';
-        icon.className = 'material-symbols-outlined ' + (isError ? 'text-red-500' : 'text-primary');
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3500);
-    }
+      // ── UTILITY ─────────────────────────────────────────────────────────
+      function toast(msg, isError = false) {
+        const t = document.getElementById("toast");
+        document.getElementById("toast-msg").textContent = msg;
+        const icon = document.getElementById("toast-icon");
+        icon.textContent = isError ? "error" : "check_circle";
+        icon.className =
+          "material-symbols-outlined " +
+          (isError ? "text-red-500" : "text-primary");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3500);
+      }
 
-    function fmtLKR(n) {
-        return 'LKR ' + Number(n).toLocaleString('en-LK', { minimumFractionDigits: 2 });
-    }
+      function fmtLKR(n) {
+        return (
+          "LKR " +
+          Number(n).toLocaleString("en-LK", { minimumFractionDigits: 2 })
+        );
+      }
 
-    function statusBadge(status) {
+      function statusBadge(status) {
         const map = {
-            'Available':   'bg-emerald-50 text-primary border-emerald-100',
-            'Rented':      'bg-blue-50 text-blue-700 border-blue-100',
-            'Maintenance': 'bg-orange-50 text-industrial-orange border-orange-100',
-            'Pending':     'bg-amber-50 text-amber-700 border-amber-100',
-            'In Progress': 'bg-blue-50 text-blue-700 border-blue-100',
-            'Completed':   'bg-emerald-50 text-primary border-emerald-100',
-            'Cancelled':   'bg-red-50 text-red-600 border-red-100',
-            'Held':        'bg-amber-50 text-amber-700 border-amber-100',
-            'Released':    'bg-emerald-50 text-primary border-emerald-100',
-            'Refunded':    'bg-slate-50 text-slate-600 border-slate-200',
-            'Scheduled':   'bg-blue-50 text-blue-700 border-blue-100',
-            'Overdue':     'bg-red-50 text-red-600 border-red-100',
+          Available: "bg-emerald-50 text-primary border-emerald-100",
+          Rented: "bg-blue-50 text-blue-700 border-blue-100",
+          Maintenance: "bg-orange-50 text-industrial-orange border-orange-100",
+          Pending: "bg-amber-50 text-amber-700 border-amber-100",
+          "In Progress": "bg-blue-50 text-blue-700 border-blue-100",
+          Completed: "bg-emerald-50 text-primary border-emerald-100",
+          Cancelled: "bg-red-50 text-red-600 border-red-100",
+          Held: "bg-amber-50 text-amber-700 border-amber-100",
+          Released: "bg-emerald-50 text-primary border-emerald-100",
+          Refunded: "bg-slate-50 text-slate-600 border-slate-200",
+          Scheduled: "bg-blue-50 text-blue-700 border-blue-100",
+          Overdue: "bg-red-50 text-red-600 border-red-100",
         };
-        const cls = map[status] || 'bg-slate-50 text-slate-600 border-slate-200';
+        const cls =
+          map[status] || "bg-slate-50 text-slate-600 border-slate-200";
         return `<span class="inline-flex items-center py-1 px-3 rounded-lg text-[10px] font-extrabold border uppercase ${cls}">${status}</span>`;
-    }
+      }
 
-    async function apiFetch(url, method = 'GET', body = null) {
-        const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      async function apiFetch(url, method = "GET", body = null) {
+        const opts = {
+          method,
+          headers: { "Content-Type": "application/json" },
+        };
         if (body) opts.body = JSON.stringify(body);
         const res = await fetch(url, opts);
         return res.json();
-    }
+      }
 
-    // ── NAVIGATION ───────────────────────────────────────────────────────
-    const viewLoaders = {
-        dashboard:   loadDashboard,
-        fleet:       loadFleet,
-        bookings:    loadBookings,
-        earnings:    loadEarnings,
+      // ── NAVIGATION ───────────────────────────────────────────────────────
+      const viewLoaders = {
+        dashboard: loadDashboard,
+        fleet: loadFleet,
+        bookings: loadBookings,
+        earnings: loadEarnings,
         maintenance: loadMaintenance,
-        settings:    loadSettings,
-    };
+        settings: loadSettings,
+      };
 
-    function switchView(viewId, clickedLink, title, subtitle) {
-        document.getElementById('header-title').innerText = title;
-        document.getElementById('header-subtitle').innerText = subtitle;
-        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + viewId).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(l => { l.classList.remove('sidebar-active','text-white'); l.classList.add('text-slate-400'); });
-        clickedLink.classList.remove('text-slate-400');
-        clickedLink.classList.add('sidebar-active','text-white');
-        document.querySelector('main').scrollTo({ top:0, behavior:'smooth' });
+      function switchView(viewId, clickedLink, title, subtitle) {
+        document.getElementById("header-title").innerText = title;
+        document.getElementById("header-subtitle").innerText = subtitle;
+        document
+          .querySelectorAll(".view-section")
+          .forEach((v) => v.classList.remove("active"));
+        document.getElementById("view-" + viewId).classList.add("active");
+        document.querySelectorAll(".nav-btn").forEach((l) => {
+          l.classList.remove("sidebar-active", "text-white");
+          l.classList.add("text-slate-400");
+        });
+        clickedLink.classList.remove("text-slate-400");
+        clickedLink.classList.add("sidebar-active", "text-white");
+        document.querySelector("main").scrollTo({ top: 0, behavior: "smooth" });
         if (viewLoaders[viewId]) viewLoaders[viewId]();
-    }
+      }
 
-    // ── DASHBOARD ────────────────────────────────────────────────────────
-    async function loadDashboard() {
-        const r = await apiFetch(API + '/dashboard.php');
-        if (!r.success) { toast(r.message, true); return; }
+      // ── DASHBOARD ────────────────────────────────────────────────────────
+      async function loadDashboard() {
+        const r = await apiFetch(API + "/dashboard.php");
+        if (!r.success) {
+          toast(r.message, true);
+          return;
+        }
         const d = r.data;
 
-        document.getElementById('dash-revenue').textContent    = fmtLKR(d.total_revenue);
-        document.getElementById('dash-rentals').textContent    = d.active_rentals + ' Machines';
-        document.getElementById('dash-maintenance').textContent = d.maintenance_alerts + ' Alert(s)';
+        document.getElementById("dash-revenue").textContent = fmtLKR(
+          d.total_revenue,
+        );
+        document.getElementById("dash-rentals").textContent =
+          d.active_rentals + " Machines";
+        document.getElementById("dash-maintenance").textContent =
+          d.maintenance_alerts + " Alert(s)";
 
         if (d.pending_bookings > 0) {
-            document.getElementById('notif-dot').classList.remove('hidden');
+          document.getElementById("notif-dot").classList.remove("hidden");
         }
 
-        const tbody = document.getElementById('dash-fleet-tbody');
+        const tbody = document.getElementById("dash-fleet-tbody");
         if (!d.fleet_preview.length) {
-            tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-slate-400 text-sm">No machines registered yet.</td></tr>`;
-            return;
+          tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-slate-400 text-sm">No machines registered yet.</td></tr>`;
+          return;
         }
-        tbody.innerHTML = d.fleet_preview.map(m => `
+        tbody.innerHTML = d.fleet_preview
+          .map(
+            (m) => `
             <tr class="hover:bg-slate-50/50 transition-colors">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-4">
@@ -536,35 +1308,42 @@
                     </div>
                 </td>
                 <td class="px-6 py-4">${statusBadge(m.status)}</td>
-                <td class="px-6 py-4 text-right text-sm font-extrabold text-slate-600">LKR ${Number(m.hourly_rate||0).toLocaleString()}/hr</td>
-            </tr>`).join('');
-    }
+                <td class="px-6 py-4 text-right text-sm font-extrabold text-slate-600">LKR ${Number(m.hourly_rate || 0).toLocaleString()}/hr</td>
+            </tr>`,
+          )
+          .join("");
+      }
 
-    // ── FLEET ────────────────────────────────────────────────────────────
-    let fleetData = [];
+      // ── FLEET ────────────────────────────────────────────────────────────
+      let fleetData = [];
 
-    async function loadFleet() {
-        const r = await apiFetch(API + '/fleet.php');
-        if (!r.success) { toast(r.message, true); return; }
+      async function loadFleet() {
+        const r = await apiFetch(API + "/fleet.php");
+        if (!r.success) {
+          toast(r.message, true);
+          return;
+        }
         fleetData = r.data;
         renderFleet(fleetData);
-    }
+      }
 
-    function machineThumb(m) {
+      function machineThumb(m) {
         if (m.image_url) {
-            return `<img src="${m.image_url}" alt="${m.model_name}" class="size-12 rounded-xl object-cover border border-slate-100" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          return `<img src="${m.image_url}" alt="${m.model_name}" class="size-12 rounded-xl object-cover border border-slate-100" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                     <div class="size-12 rounded-xl bg-slate-100 items-center justify-center text-slate-400" style="display:none"><span class="material-symbols-outlined">agriculture</span></div>`;
         }
         return `<div class="size-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400"><span class="material-symbols-outlined">agriculture</span></div>`;
-    }
+      }
 
-    function renderFleet(machines) {
-        const tbody = document.getElementById('fleet-tbody');
+      function renderFleet(machines) {
+        const tbody = document.getElementById("fleet-tbody");
         if (!machines.length) {
-            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No machines yet. Click "Add Machine" to register one.</td></tr>`;
-            return;
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No machines yet. Click "Add Machine" to register one.</td></tr>`;
+          return;
         }
-        tbody.innerHTML = machines.map(m => `
+        tbody.innerHTML = machines
+          .map(
+            (m) => `
             <tr class="hover:bg-slate-50/50 transition-colors">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-4">
@@ -574,270 +1353,379 @@
                 </td>
                 <td class="px-6 py-4">${statusBadge(m.status)}</td>
                 <td class="px-6 py-4 font-extrabold text-slate-600 text-sm">${m.total_hours} hrs</td>
-                <td class="px-6 py-4 text-xs font-bold ${m.next_service_date ? 'text-slate-500' : 'text-slate-300'}">${m.next_service_date || '—'}</td>
+                <td class="px-6 py-4 text-xs font-bold ${m.next_service_date ? "text-slate-500" : "text-slate-300"}">${m.next_service_date || "—"}</td>
                 <td class="px-6 py-4 text-right">
                     <button onclick="openEditMachineModal(${m.id})" class="p-2 text-slate-400 hover:text-primary transition-colors bg-slate-50 rounded-lg border border-slate-200"><span class="material-symbols-outlined text-sm">edit</span></button>
                     <button onclick="deleteMachine(${m.id})" class="ml-2 p-2 text-slate-400 hover:text-red-500 transition-colors bg-slate-50 rounded-lg border border-slate-200"><span class="material-symbols-outlined text-sm">delete</span></button>
                 </td>
-            </tr>`).join('');
-    }
+            </tr>`,
+          )
+          .join("");
+      }
 
-    function openAddMachineModal() {
-        document.getElementById('machine-modal-title').textContent = 'Register New Machine';
-        document.getElementById('machine-id').value = '';
-        document.getElementById('machine-category').value = 'Tractor';
-        document.getElementById('machine-model').value = '';
-        document.getElementById('machine-serial').value = '';
-        document.getElementById('machine-rate').value = '';
-        document.getElementById('machine-description').value = '';
-        document.getElementById('machine-service-date').value = '';
-        document.getElementById('machine-status-group').style.display = 'none';
-        document.getElementById('machine-hours-group').style.display = 'none';
-        document.getElementById('machine-serial').readOnly = false;
-        document.getElementById('machine-submit-btn').textContent = 'Submit Registration';
-        document.getElementById('modal-add-machine').style.display = 'flex';
-    }
+      function openAddMachineModal() {
+        document.getElementById("machine-modal-title").textContent =
+          "Register New Machine";
+        document.getElementById("machine-id").value = "";
+        document.getElementById("machine-category").value = "Tractor";
+        document.getElementById("machine-model").value = "";
+        document.getElementById("machine-serial").value = "";
+        document.getElementById("machine-rate").value = "";
+        document.getElementById("machine-description").value = "";
+        document.getElementById("machine-service-date").value = "";
+        document.getElementById("machine-status-group").style.display = "none";
+        document.getElementById("machine-hours-group").style.display = "none";
+        document.getElementById("machine-serial").readOnly = false;
+        document.getElementById("machine-submit-btn").textContent =
+          "Submit Registration";
+        document.getElementById("modal-add-machine").style.display = "flex";
+      }
 
-    function openEditMachineModal(id) {
-        const m = fleetData.find(x => x.id === id);
+      function openEditMachineModal(id) {
+        const m = fleetData.find((x) => x.id === id);
         if (!m) return;
-        document.getElementById('machine-modal-title').textContent = 'Edit Machine';
-        document.getElementById('machine-id').value = m.id;
-        document.getElementById('machine-category').value = m.category;
-        document.getElementById('machine-model').value = m.model_name;
-        document.getElementById('machine-serial').value = m.serial_number;
-        document.getElementById('machine-serial').readOnly = true;
-        document.getElementById('machine-rate').value = m.hourly_rate;
-        document.getElementById('machine-description').value = m.description || '';
-        document.getElementById('machine-service-date').value = m.next_service_date || '';
-        document.getElementById('machine-status').value = m.status;
-        document.getElementById('machine-hours').value = m.total_hours || 0;
-        document.getElementById('machine-status-group').style.display = '';
-        document.getElementById('machine-hours-group').style.display = '';
-        document.getElementById('machine-submit-btn').textContent = 'Save Changes';
-        document.getElementById('modal-add-machine').style.display = 'flex';
-    }
+        document.getElementById("machine-modal-title").textContent =
+          "Edit Machine";
+        document.getElementById("machine-id").value = m.id;
+        document.getElementById("machine-category").value = m.category;
+        document.getElementById("machine-model").value = m.model_name;
+        document.getElementById("machine-serial").value = m.serial_number;
+        document.getElementById("machine-serial").readOnly = true;
+        document.getElementById("machine-rate").value = m.hourly_rate;
+        document.getElementById("machine-description").value =
+          m.description || "";
+        document.getElementById("machine-service-date").value =
+          m.next_service_date || "";
+        document.getElementById("machine-status").value = m.status;
+        document.getElementById("machine-hours").value = m.total_hours || 0;
+        document.getElementById("machine-status-group").style.display = "";
+        document.getElementById("machine-hours-group").style.display = "";
+        document.getElementById("machine-submit-btn").textContent =
+          "Save Changes";
+        document.getElementById("modal-add-machine").style.display = "flex";
+      }
 
-    function closeMachineModal() {
-        document.getElementById('modal-add-machine').style.display = 'none';
-    }
+      function closeMachineModal() {
+        document.getElementById("modal-add-machine").style.display = "none";
+      }
 
-    async function submitMachine() {
-        const id = document.getElementById('machine-id').value;
+      async function submitMachine() {
+        const id = document.getElementById("machine-id").value;
         const payload = {
-            id:               id ? parseInt(id) : undefined,
-            category:         document.getElementById('machine-category').value,
-            model_name:       document.getElementById('machine-model').value.trim(),
-            serial_number:    document.getElementById('machine-serial').value.trim(),
-            hourly_rate:      document.getElementById('machine-rate').value,
-            description:      document.getElementById('machine-description').value.trim(),
-            next_service_date: document.getElementById('machine-service-date').value,
-            status:           document.getElementById('machine-status').value,
-            total_hours:      document.getElementById('machine-hours').value,
-            image_url:        document.getElementById('machine-image').value.trim(),
+          id: id ? parseInt(id) : undefined,
+          category: document.getElementById("machine-category").value,
+          model_name: document.getElementById("machine-model").value.trim(),
+          serial_number: document.getElementById("machine-serial").value.trim(),
+          hourly_rate: document.getElementById("machine-rate").value,
+          description: document
+            .getElementById("machine-description")
+            .value.trim(),
+          next_service_date: document.getElementById("machine-service-date")
+            .value,
+          status: document.getElementById("machine-status").value,
+          total_hours: document.getElementById("machine-hours").value,
+          image_url: document.getElementById("machine-image").value.trim(),
         };
-        if (!payload.model_name || !payload.serial_number || !payload.hourly_rate) {
-            toast('Please fill in all required fields.', true); return;
+        if (
+          !payload.model_name ||
+          !payload.serial_number ||
+          !payload.hourly_rate
+        ) {
+          toast("Please fill in all required fields.", true);
+          return;
         }
-        const method = id ? 'PUT' : 'POST';
-        const r = await apiFetch(API + '/fleet.php', method, payload);
+        const method = id ? "PUT" : "POST";
+        const r = await apiFetch(API + "/fleet.php", method, payload);
         toast(r.message, !r.success);
-        if (r.success) { closeMachineModal(); loadFleet(); loadDashboard(); }
-    }
+        if (r.success) {
+          closeMachineModal();
+          loadFleet();
+          loadDashboard();
+        }
+      }
 
-    async function deleteMachine(id) {
-        if (!confirm('Delete this machine? This cannot be undone.')) return;
-        const r = await apiFetch(API + '/fleet.php', 'DELETE', { id });
+      async function deleteMachine(id) {
+        if (!confirm("Delete this machine? This cannot be undone.")) return;
+        const r = await apiFetch(API + "/fleet.php", "DELETE", { id });
         toast(r.message, !r.success);
-        if (r.success) { loadFleet(); loadDashboard(); }
-    }
+        if (r.success) {
+          loadFleet();
+          loadDashboard();
+        }
+      }
 
-    // ── BOOKINGS ─────────────────────────────────────────────────────────
-    async function loadBookings() {
-        const r = await apiFetch(API + '/bookings.php');
-        if (!r.success) { toast(r.message, true); return; }
+      // ── BOOKINGS ─────────────────────────────────────────────────────────
+      async function loadBookings() {
+        const r = await apiFetch(API + "/bookings.php");
+        if (!r.success) {
+          toast(r.message, true);
+          return;
+        }
         const bookings = r.data;
-        const pending = bookings.filter(b => b.status === 'Pending').length;
-        const badge = document.getElementById('pending-badge');
-        if (pending > 0) { badge.textContent = pending + ' Pending'; badge.classList.remove('hidden'); }
-        else badge.classList.add('hidden');
+        const pending = bookings.filter((b) => b.status === "Pending").length;
+        const badge = document.getElementById("pending-badge");
+        if (pending > 0) {
+          badge.textContent = pending + " Pending";
+          badge.classList.remove("hidden");
+        } else badge.classList.add("hidden");
 
-        const tbody = document.getElementById('bookings-tbody');
+        const tbody = document.getElementById("bookings-tbody");
         if (!bookings.length) {
-            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400 text-sm">No bookings found.</td></tr>`;
-            return;
+          tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400 text-sm">No bookings found.</td></tr>`;
+          return;
         }
-        tbody.innerHTML = bookings.map(b => `
+        tbody.innerHTML = bookings
+          .map(
+            (b) => `
             <tr class="hover:bg-slate-50/50 transition-colors">
                 <td class="px-6 py-4"><p class="font-bold text-slate-800 text-sm">${b.model_name}</p><p class="text-xs text-slate-400">${b.category}</p></td>
-                <td class="px-6 py-4"><p class="text-sm font-bold text-slate-700">${b.lessee_name}</p><p class="text-xs text-slate-400">${b.lessee_phone||'—'}</p></td>
+                <td class="px-6 py-4"><p class="text-sm font-bold text-slate-700">${b.lessee_name}</p><p class="text-xs text-slate-400">${b.lessee_phone || "—"}</p></td>
                 <td class="px-6 py-4 text-sm font-extrabold text-slate-700">LKR ${Number(b.total_amount).toLocaleString()}</td>
-                <td class="px-6 py-4 text-xs font-bold text-slate-500">${b.created_at.split(' ')[0]}</td>
+                <td class="px-6 py-4 text-xs font-bold text-slate-500">${b.created_at.split(" ")[0]}</td>
                 <td class="px-6 py-4">${statusBadge(b.status)}</td>
                 <td class="px-6 py-4 text-right">
-                    ${b.status === 'Pending' ? `
+                    ${
+                      b.status === "Pending"
+                        ? `
                         <button onclick="updateBooking(${b.id},'In Progress')" class="mr-1 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark">Accept</button>
                         <button onclick="updateBooking(${b.id},'Cancelled')" class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold hover:bg-red-100">Decline</button>
-                    ` : b.status === 'In Progress' ? `
+                    `
+                        : b.status === "In Progress"
+                          ? `
                         <button onclick="updateBooking(${b.id},'Completed')" class="px-3 py-1.5 bg-emerald-50 text-primary border border-emerald-200 rounded-lg text-xs font-bold">Mark Done</button>
-                    ` : '—'}
+                    `
+                          : "—"
+                    }
                 </td>
-            </tr>`).join('');
-    }
+            </tr>`,
+          )
+          .join("");
+      }
 
-    async function updateBooking(id, status) {
-        const r = await apiFetch(API + '/bookings.php', 'PUT', { id, status });
+      async function updateBooking(id, status) {
+        const r = await apiFetch(API + "/bookings.php", "PUT", { id, status });
         toast(r.message, !r.success);
-        if (r.success) { loadBookings(); loadDashboard(); }
-    }
+        if (r.success) {
+          loadBookings();
+          loadDashboard();
+        }
+      }
 
-    // ── EARNINGS ─────────────────────────────────────────────────────────
-    let earningsData = [];
+      // ── EARNINGS ─────────────────────────────────────────────────────────
+      let earningsData = [];
 
-    async function loadEarnings() {
-        const r = await apiFetch(API + '/earnings.php');
-        if (!r.success) { toast(r.message, true); return; }
+      async function loadEarnings() {
+        const r = await apiFetch(API + "/earnings.php");
+        if (!r.success) {
+          toast(r.message, true);
+          return;
+        }
         const d = r.data;
         earningsData = d.payout_history;
-        document.getElementById('earn-available').textContent = fmtLKR(d.available_balance);
-        document.getElementById('earn-escrow').textContent    = fmtLKR(d.escrow_balance);
+        document.getElementById("earn-available").textContent = fmtLKR(
+          d.available_balance,
+        );
+        document.getElementById("earn-escrow").textContent = fmtLKR(
+          d.escrow_balance,
+        );
 
-        const tbody = document.getElementById('earnings-tbody');
+        const tbody = document.getElementById("earnings-tbody");
         if (!d.payout_history.length) {
-            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No payment records yet.</td></tr>`;
-            return;
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No payment records yet.</td></tr>`;
+          return;
         }
-        tbody.innerHTML = d.payout_history.map(p => `
+        tbody.innerHTML = d.payout_history
+          .map(
+            (p) => `
             <tr class="hover:bg-slate-50/50">
-                <td class="px-6 py-4 text-xs font-bold text-slate-600">${p.created_at.split(' ')[0]}</td>
+                <td class="px-6 py-4 text-xs font-bold text-slate-600">${p.created_at.split(" ")[0]}</td>
                 <td class="px-6 py-4 text-xs font-mono font-bold text-slate-400">#BKG-${p.booking_id}</td>
                 <td class="px-6 py-4 text-xs font-bold text-slate-700">${p.model_name}</td>
                 <td class="px-6 py-4 text-sm font-extrabold text-slate-800">${Number(p.lessor_payout).toLocaleString()}</td>
                 <td class="px-6 py-4 text-right">${statusBadge(p.status)}</td>
-            </tr>`).join('');
-    }
+            </tr>`,
+          )
+          .join("");
+      }
 
-    function downloadEarningsCSV() {
-        if (!earningsData.length) { toast('No data to download.', true); return; }
-        const rows = [['Date','Booking ID','Machine','Payout (LKR)','Status']];
-        earningsData.forEach(p => rows.push([p.created_at.split(' ')[0], '#BKG-'+p.booking_id, p.model_name, p.lessor_payout, p.status]));
-        const csv = rows.map(r => r.join(',')).join('\n');
-        const a = document.createElement('a');
-        a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-        a.download = 'agrilease_earnings.csv';
-        a.click();
-    }
-
-    // ── MAINTENANCE ───────────────────────────────────────────────────────
-    async function loadMaintenance() {
-        const r = await apiFetch(API + '/maintenance.php');
-        if (!r.success) { toast(r.message, true); return; }
-        const d = r.data;
-        document.getElementById('maint-active').textContent    = d.active_repairs + ' Machines';
-        document.getElementById('maint-scheduled').textContent = d.scheduled + ' Upcoming';
-        document.getElementById('maint-cost').textContent      = fmtLKR(d.total_cost_ytd);
-
-        const tbody = document.getElementById('maintenance-tbody');
-        if (!d.service_history.length) {
-            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No service records yet.</td></tr>`;
-            return;
+      function downloadEarningsCSV() {
+        if (!earningsData.length) {
+          toast("No data to download.", true);
+          return;
         }
-        tbody.innerHTML = d.service_history.map(s => `
+        const rows = [
+          ["Date", "Booking ID", "Machine", "Payout (LKR)", "Status"],
+        ];
+        earningsData.forEach((p) =>
+          rows.push([
+            p.created_at.split(" ")[0],
+            "#BKG-" + p.booking_id,
+            p.model_name,
+            p.lessor_payout,
+            p.status,
+          ]),
+        );
+        const csv = rows.map((r) => r.join(",")).join("\n");
+        const a = document.createElement("a");
+        a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+        a.download = "agrilease_earnings.csv";
+        a.click();
+      }
+
+      // ── MAINTENANCE ───────────────────────────────────────────────────────
+      async function loadMaintenance() {
+        const r = await apiFetch(API + "/maintenance.php");
+        if (!r.success) {
+          toast(r.message, true);
+          return;
+        }
+        const d = r.data;
+        document.getElementById("maint-active").textContent =
+          d.active_repairs + " Machines";
+        document.getElementById("maint-scheduled").textContent =
+          d.scheduled + " Upcoming";
+        document.getElementById("maint-cost").textContent = fmtLKR(
+          d.total_cost_ytd,
+        );
+
+        const tbody = document.getElementById("maintenance-tbody");
+        if (!d.service_history.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No service records yet.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = d.service_history
+          .map(
+            (s) => `
             <tr class="hover:bg-slate-50/50">
                 <td class="px-6 py-4 text-xs font-bold text-slate-600">${s.service_date}</td>
                 <td class="px-6 py-4 text-xs font-bold text-slate-700">${s.model_name}</td>
                 <td class="px-6 py-4 text-xs text-slate-500">${s.service_type}</td>
                 <td class="px-6 py-4 text-sm font-extrabold text-slate-800">${Number(s.cost).toLocaleString()}</td>
                 <td class="px-6 py-4 text-right">${statusBadge(s.status)}</td>
-            </tr>`).join('');
-    }
+            </tr>`,
+          )
+          .join("");
+      }
 
-    function openLogServiceModal() {
+      function openLogServiceModal() {
         // populate machine dropdown
-        const sel = document.getElementById('service-machine-id');
+        const sel = document.getElementById("service-machine-id");
         sel.innerHTML = '<option value="">Select machine...</option>';
-        fleetData.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.model_name + ' (' + m.serial_number + ')'; sel.appendChild(o); });
-        document.getElementById('service-date').value = new Date().toISOString().split('T')[0];
-        document.getElementById('modal-log-service').style.display = 'flex';
-    }
+        fleetData.forEach((m) => {
+          const o = document.createElement("option");
+          o.value = m.id;
+          o.textContent = m.model_name + " (" + m.serial_number + ")";
+          sel.appendChild(o);
+        });
+        document.getElementById("service-date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("modal-log-service").style.display = "flex";
+      }
 
-    async function submitService() {
+      async function submitService() {
         const payload = {
-            machine_id:   document.getElementById('service-machine-id').value,
-            service_type: document.getElementById('service-type').value.trim(),
-            cost:         document.getElementById('service-cost').value,
-            service_date: document.getElementById('service-date').value,
-            status:       document.getElementById('service-status').value,
+          machine_id: document.getElementById("service-machine-id").value,
+          service_type: document.getElementById("service-type").value.trim(),
+          cost: document.getElementById("service-cost").value,
+          service_date: document.getElementById("service-date").value,
+          status: document.getElementById("service-status").value,
         };
         if (!payload.machine_id || !payload.service_type || !payload.cost) {
-            toast('Please fill all required fields.', true); return;
+          toast("Please fill all required fields.", true);
+          return;
         }
-        const r = await apiFetch(API + '/maintenance.php', 'POST', payload);
-        toast(r.message, !r.success);
-        if (r.success) { document.getElementById('modal-log-service').style.display = 'none'; loadMaintenance(); loadFleet(); }
-    }
-
-    // ── SETTINGS ─────────────────────────────────────────────────────────
-    async function loadSettings() {
-        const r = await apiFetch(API + '/settings.php');
-        if (!r.success) { toast(r.message, true); return; }
-        const u = r.data;
-        document.getElementById('settings-name').value     = u.full_name;
-        document.getElementById('settings-phone').value    = u.phone || '';
-        document.getElementById('settings-district').value = u.district || '';
-        document.getElementById('settings-email').value    = u.email;
-        document.getElementById('settings-password').value = '';
-    }
-
-    async function saveSettings() {
-        const payload = {
-            full_name:    document.getElementById('settings-name').value.trim(),
-            phone:        document.getElementById('settings-phone').value.trim(),
-            district:     document.getElementById('settings-district').value.trim(),
-            new_password: document.getElementById('settings-password').value,
-        };
-        const r = await apiFetch(API + '/settings.php', 'POST', payload);
+        const r = await apiFetch(API + "/maintenance.php", "POST", payload);
         toast(r.message, !r.success);
         if (r.success) {
-            document.getElementById('sidebar-name').textContent = payload.full_name;
-            document.getElementById('sidebar-initials').textContent = payload.full_name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+          document.getElementById("modal-log-service").style.display = "none";
+          loadMaintenance();
+          loadFleet();
         }
-    }
+      }
 
-    // ── LOGOUT ────────────────────────────────────────────────────────────
-    async function logout() {
-        await fetch('api/logout.php');
-        window.location.href = 'login.html';
-    }
+      // ── SETTINGS ─────────────────────────────────────────────────────────
+      async function loadSettings() {
+        const r = await apiFetch(API + "/settings.php");
+        if (!r.success) {
+          toast(r.message, true);
+          return;
+        }
+        const u = r.data;
+        document.getElementById("settings-name").value = u.full_name;
+        document.getElementById("settings-phone").value = u.phone || "";
+        document.getElementById("settings-district").value = u.district || "";
+        document.getElementById("settings-email").value = u.email;
+        document.getElementById("settings-password").value = "";
+      }
 
-    // ── SEARCH ────────────────────────────────────────────────────────────
-    document.getElementById('global-search').addEventListener('input', function() {
-        const q = this.value.toLowerCase().trim();
-        const activeView = document.querySelector('.view-section.active')?.id;
+      async function saveSettings() {
+        const payload = {
+          full_name: document.getElementById("settings-name").value.trim(),
+          phone: document.getElementById("settings-phone").value.trim(),
+          district: document.getElementById("settings-district").value.trim(),
+          new_password: document.getElementById("settings-password").value,
+        };
+        const r = await apiFetch(API + "/settings.php", "POST", payload);
+        toast(r.message, !r.success);
+        if (r.success) {
+          document.getElementById("sidebar-name").textContent =
+            payload.full_name;
+          document.getElementById("sidebar-initials").textContent =
+            payload.full_name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2);
+        }
+      }
 
-        if (activeView === 'view-fleet') {
-            if (!q) { renderFleet(fleetData); return; }
-            const filtered = fleetData.filter(m =>
+      // ── LOGOUT ────────────────────────────────────────────────────────────
+      async function logout() {
+        await fetch("api/logout.php");
+        window.location.href = "login.html";
+      }
+
+      // ── SEARCH ────────────────────────────────────────────────────────────
+      document
+        .getElementById("global-search")
+        .addEventListener("input", function () {
+          const q = this.value.toLowerCase().trim();
+          const activeView = document.querySelector(".view-section.active")?.id;
+
+          if (activeView === "view-fleet") {
+            if (!q) {
+              renderFleet(fleetData);
+              return;
+            }
+            const filtered = fleetData.filter(
+              (m) =>
                 m.model_name.toLowerCase().includes(q) ||
                 m.serial_number.toLowerCase().includes(q) ||
                 m.category.toLowerCase().includes(q) ||
-                m.status.toLowerCase().includes(q)
+                m.status.toLowerCase().includes(q),
             );
             renderFleet(filtered);
-        }
-    });
+          }
+        });
 
-    // ── INIT ──────────────────────────────────────────────────────────────
-    async function init() {
-        const r = await apiFetch('api/lessor/settings.php');
+      // ── INIT ──────────────────────────────────────────────────────────────
+      async function init() {
+        const r = await apiFetch("api/lessor/settings.php");
         if (r.success) {
-            const u = r.data;
-            document.getElementById('sidebar-name').textContent = u.full_name;
-            document.getElementById('sidebar-initials').textContent = u.full_name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+          const u = r.data;
+          document.getElementById("sidebar-name").textContent = u.full_name;
+          document.getElementById("sidebar-initials").textContent = u.full_name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2);
         }
         loadDashboard();
-    }
-    init();
-</script>
-</body>
+      }
+      init();
+    </script>
+  </body>
 </html>

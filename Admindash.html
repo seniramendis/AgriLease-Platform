@@ -793,7 +793,7 @@
         // AUTHENTICATION CHECK
         const userData = localStorage.getItem("agrilease_user");
         if (!userData) {
-          window.location.href = "login.html";
+          window.location.replace("login.html");
           return;
         }
 

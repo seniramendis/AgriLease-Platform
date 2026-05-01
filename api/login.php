@@ -19,7 +19,7 @@ if (isset($data->email) && isset($data->password)) {
         $stmt->execute([$data->email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($data->password, $user['password_hash'])) {
+        if ($user && password_verify($data->password, $user['password_hash']) && strtolower($user['role']) === strtolower($data->role)) {
 
             if (isset($user['status']) && $user['status'] === 'Banned') {
                 echo json_encode([
@@ -31,22 +31,22 @@ if (isset($data->email) && isset($data->password)) {
 
             // ✅ FIX: Save user to PHP session so backend APIs can verify who is logged in
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['role']    = $user['role'];
-            $_SESSION['name']    = $user['full_name'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['name'] = $user['full_name'];
 
             echo json_encode([
                 "success" => true,
                 "message" => "Login successful",
                 "user" => [
-                    "id"    => $user['id'],
-                    "name"  => $user['full_name'],
+                    "id" => $user['id'],
+                    "name" => $user['full_name'],
                     "email" => $data->email,
-                    "role"  => $user['role']
+                    "role" => $user['role']
                 ]
             ]);
 
         } else {
-            echo json_encode(["success" => false, "message" => "Invalid email or password."]);
+            echo json_encode(["success" => false, "message" => "Invalid credentials or role mismatch. Please select the correct role."]);
         }
 
     } catch (PDOException $e) {

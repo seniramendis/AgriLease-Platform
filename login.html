@@ -199,7 +199,7 @@
 
       .input-group input:focus {
         background: rgba(255, 255, 255, 0.2);
-        border-color: var(--primary);
+        border-color: #2d6c50;
         box-shadow: 0 12px 40px rgba(45, 108, 80, 0.15);
         transform: translateY(-2px);
       }
@@ -270,7 +270,7 @@
       }
       .back-btn:hover {
         opacity: 1;
-        color: var(--accent);
+        color: #f59e0b;
       }
 
       .role-card {
@@ -347,6 +347,171 @@
       .animate-shake {
         animation: shake 0.4s both;
       }
+
+      /* ── TOAST ─────────────────────────────────────────── */
+      #login-toast {
+        position: fixed;
+        bottom: 2.5rem;
+        left: 50%;
+        transform: translateX(-50%) scale(0.6);
+        opacity: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        min-width: 320px;
+        max-width: 460px;
+        padding: 1rem 1.4rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        pointer-events: none;
+      }
+      #login-toast.show {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .toast-icon-wrap {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .toast-icon-wrap .material-symbols-outlined {
+        font-size: 1.2rem;
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 600;
+      }
+      .toast-body {
+        flex: 1;
+      }
+      .toast-title {
+        font-family: "Manrope", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+        color: #0f172a;
+      }
+      .toast-message {
+        font-family: "Manrope", sans-serif;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #475569;
+        line-height: 1.45;
+      }
+      .toast-close {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 2px;
+        border-radius: 6px;
+        transition: color 0.2s;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .toast-close:hover {
+        color: #0f172a;
+      }
+      .toast-close .material-symbols-outlined {
+        font-size: 1rem;
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 600;
+      }
+
+      /* Toast type variants */
+      #login-toast.toast-error {
+        border-left: 3px solid #ef4444;
+      }
+      #login-toast.toast-warning {
+        border-left: 3px solid #f59e0b;
+      }
+      #login-toast.toast-success {
+        border-left: 3px solid #2d6c50;
+      }
+      #login-toast.toast-info {
+        border-left: 3px solid #3b82f6;
+      }
+
+      .toast-error .toast-icon-wrap {
+        background: #fef2f2;
+        color: #ef4444;
+      }
+      .toast-warning .toast-icon-wrap {
+        background: #fffbeb;
+        color: #f59e0b;
+      }
+      .toast-success .toast-icon-wrap {
+        background: #f0fdf4;
+        color: #2d6c50;
+      }
+      .toast-info .toast-icon-wrap {
+        background: #eff6ff;
+        color: #3b82f6;
+      }
+
+      .toast-error .toast-title {
+        color: #dc2626;
+      }
+      .toast-warning .toast-title {
+        color: #d97706;
+      }
+      .toast-success .toast-title {
+        color: #2d6c50;
+      }
+      .toast-info .toast-title {
+        color: #2563eb;
+      }
+
+      /* Progress bar */
+      .toast-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        border-radius: 0 0 20px 20px;
+        width: 100%;
+        transform-origin: left;
+        animation: none;
+      }
+      #login-toast.show .toast-progress {
+        animation: toastProgress 4.5s linear forwards;
+      }
+      @keyframes toastProgress {
+        from {
+          transform: scaleX(1);
+        }
+        to {
+          transform: scaleX(0);
+        }
+      }
+      .toast-error .toast-progress {
+        background: #ef4444;
+      }
+      .toast-warning .toast-progress {
+        background: #f59e0b;
+      }
+      .toast-success .toast-progress {
+        background: #2d6c50;
+      }
+      .toast-info .toast-progress {
+        background: #3b82f6;
+      }
     </style>
   </head>
 
@@ -382,7 +547,7 @@
             </h1>
           </div>
           <p
-            class="text-lg md:text-xl text-white/60 mb-10 font-medium max-w-xl transition-all duration-700 portal-active:text-white/80 portal-active:text-sm portal-active:max-w-[280px]"
+            class="text-lg md:text-xl text-white/60 mb-10 font-medium max-w-xl transition-all duration-700"
             id="tagline"
           >
             Harvest more than just crops. Join Sri Lanka's elite agricultural
@@ -402,6 +567,7 @@
         </div>
 
         <div class="form-pane">
+          <!-- LOGIN FORM -->
           <form class="form-stage" id="login-stage">
             <header class="text-center">
               <h2
@@ -474,6 +640,7 @@
             </div>
           </form>
 
+          <!-- REGISTER FORM -->
           <form class="form-stage hidden-stage" id="register-stage">
             <header class="text-center">
               <h2
@@ -562,15 +729,95 @@
       </div>
     </div>
 
+    <!-- ── TOAST NOTIFICATION ─────────────────────────────────── -->
+    <div id="login-toast">
+      <div class="toast-icon-wrap">
+        <span id="toast-icon" class="material-symbols-outlined">error</span>
+      </div>
+      <div class="toast-body">
+        <div id="toast-title" class="toast-title">Error</div>
+        <div id="toast-message" class="toast-message">
+          Something went wrong.
+        </div>
+      </div>
+      <button class="toast-close" onclick="hideToast()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="toast-progress"></div>
+    </div>
+
     <script>
+      // ── TOAST SYSTEM ────────────────────────────────────────────
+      const TOAST_CONFIG = {
+        error: { icon: "error", title: "Login Failed" },
+        warning: { icon: "warning", title: "Warning" },
+        success: { icon: "check_circle", title: "Success" },
+        info: { icon: "info", title: "Info" },
+      };
+
+      let _toastTimer = null;
+
+      function showToast(message, type = "error") {
+        const toast = document.getElementById("login-toast");
+        const iconEl = document.getElementById("toast-icon");
+        const titleEl = document.getElementById("toast-title");
+        const msgEl = document.getElementById("toast-message");
+        const cfg = TOAST_CONFIG[type] || TOAST_CONFIG.error;
+
+        // Swap type classes
+        toast.classList.remove(
+          "toast-error",
+          "toast-warning",
+          "toast-success",
+          "toast-info",
+        );
+        toast.classList.add(`toast-${type}`);
+
+        // Customise title per message context
+        if (type === "error") {
+          if (message.toLowerCase().includes("role"))
+            titleEl.textContent = "Wrong Role Selected";
+          else if (message.toLowerCase().includes("banned"))
+            titleEl.textContent = "Account Suspended";
+          else if (
+            message.toLowerCase().includes("email") ||
+            message.toLowerCase().includes("password")
+          )
+            titleEl.textContent = "Invalid Credentials";
+          else if (
+            message.toLowerCase().includes("database") ||
+            message.toLowerCase().includes("connection")
+          )
+            titleEl.textContent = "Server Error";
+          else titleEl.textContent = "Login Failed";
+        } else if (type === "success") {
+          titleEl.textContent = "Account Created";
+        } else {
+          titleEl.textContent = cfg.title;
+        }
+
+        iconEl.textContent = cfg.icon;
+        msgEl.textContent = message;
+
+        // Reset & show
+        toast.classList.remove("show");
+        void toast.offsetWidth; // force reflow to restart animation
+        toast.classList.add("show");
+
+        clearTimeout(_toastTimer);
+        _toastTimer = setTimeout(() => hideToast(), 4500);
+      }
+
+      function hideToast() {
+        document.getElementById("login-toast").classList.remove("show");
+      }
+
+      // ── INIT ────────────────────────────────────────────────────
       document.addEventListener("DOMContentLoaded", () => {
-        // Nuke storage if arriving from a logout to ensure fresh state
         if (localStorage.getItem("clear_on_arrival")) {
           localStorage.clear();
         }
-        setTimeout(() => {
-          document.body.classList.add("loaded");
-        }, 100);
+        setTimeout(() => document.body.classList.add("loaded"), 100);
       });
 
       function activatePortal() {
@@ -580,7 +827,7 @@
       function setRole(element, role) {
         document
           .querySelectorAll(".role-card")
-          .forEach((card) => card.classList.remove("active"));
+          .forEach((c) => c.classList.remove("active"));
         element.classList.add("active");
         document.getElementById("login-role-text").innerText = role;
       }
@@ -605,8 +852,7 @@
         }
       }
 
-      // --- BULLETPROOF EVENT LISTENERS ---
-
+      // ── LOGIN SUBMIT ────────────────────────────────────────────
       document
         .getElementById("login-stage")
         .addEventListener("submit", async function (e) {
@@ -629,14 +875,12 @@
             const result = await response.json();
 
             if (result.success) {
-              // WIPE OLD DATA BEFORE SAVING NEW
               localStorage.clear();
               localStorage.setItem(
                 "agrilease_user",
                 JSON.stringify(result.user),
               );
 
-              // REPLACE avoids browser "back button" caching of the login state
               let target = "Lessordash.html";
               if (result.user.role === "Lessee") target = "Lessedash.html";
               else if (result.user.role === "Driver")
@@ -645,16 +889,20 @@
 
               window.location.replace(target);
             } else {
-              alert("Login Failed: " + result.message);
+              showToast(result.message, "error");
               card.classList.add("animate-shake");
               setTimeout(() => card.classList.remove("animate-shake"), 400);
             }
           } catch (err) {
             console.error(err);
-            alert("Database connection error. Check console.");
+            showToast(
+              "Connection error. Please check your network and try again.",
+              "error",
+            );
           }
         });
 
+      // ── REGISTER SUBMIT ─────────────────────────────────────────
       document
         .getElementById("register-stage")
         .addEventListener("submit", async function (e) {
@@ -678,17 +926,23 @@
             const result = await response.json();
 
             if (result.success) {
-              alert("Account created successfully! Please log in.");
+              showToast(
+                "Account created successfully! Please log in.",
+                "success",
+              );
               toggleStage("login");
               document.getElementById("login-email").value = payload.email;
             } else {
-              alert("Registration Failed: " + result.message);
+              showToast(result.message, "error");
               card.classList.add("animate-shake");
               setTimeout(() => card.classList.remove("animate-shake"), 400);
             }
           } catch (err) {
             console.error(err);
-            alert("Database connection error. Check console.");
+            showToast(
+              "Connection error. Please check your network and try again.",
+              "error",
+            );
           }
         });
 
