@@ -11,16 +11,26 @@ require 'db_connect.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
+// 1. Verify we received email and password first
 if (isset($data->email) && isset($data->password)) {
     try {
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+        // 2. Fetch the user from the database
         $stmt = $conn->prepare("SELECT id, full_name, role, password_hash, status FROM users WHERE email = ?");
         $stmt->execute([$data->email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($data->password, $user['password_hash']) && strtolower($user['role']) === strtolower($data->role)) {
+        // 3. Setup Role Match logic AFTER the user is fetched
+        $roleMatch = false;
+        if ($user && isset($data->role)) {
+            $roleMatch = (strtolower($user['role']) === strtolower($data->role)) || ($user['role'] === 'Admin');
+        }
 
+        // 4. Check if user exists, password is correct, and role matches
+        if ($user && password_verify($data->password, $user['password_hash']) && $roleMatch) {
+
+            // Check if banned
             if (isset($user['status']) && $user['status'] === 'Banned') {
                 echo json_encode([
                     "success" => false,
@@ -41,7 +51,7 @@ if (isset($data->email) && isset($data->password)) {
                     "id" => $user['id'],
                     "name" => $user['full_name'],
                     "email" => $data->email,
-                    "role" => $user['role']
+                    "role" => $user['role'] // Returns the actual DB role, useful if they logged in as Admin
                 ]
             ]);
 
