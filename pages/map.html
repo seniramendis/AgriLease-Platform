@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Map View | AgriLease</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="../assets/css/theme.css"/>
+    <link rel="stylesheet" href="../assets/css/main.css"/>
+    <link rel="stylesheet" href="../assets/css/forms.css"/>
+    <style>
+        body { overflow: hidden; }
+        #map-container { width: 100%; height: calc(100vh - var(--nav-height)); }
+        .map-panel {
+            position: absolute; top: calc(var(--nav-height) + 1rem); left: 1rem; z-index: 400;
+            width: 300px; background: white; border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg); overflow: hidden;
+        }
+        .map-panel-header { padding: 1.2rem 1.5rem; background: var(--primary); color: white; }
+        .map-panel-header h3 { font-size: 1rem; margin-bottom: 4px; }
+        .map-panel-body { padding: 1.2rem; display: flex; flex-direction: column; gap: 12px; }
+        .map-stat { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-light); border-radius: var(--radius-md); }
+        .map-stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .map-stat-value { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+        .map-locate-btn {
+            position: absolute; bottom: 2rem; left: 1rem; z-index: 400;
+            background: white; border: none; border-radius: var(--radius-md);
+            padding: 0.75rem 1.2rem; box-shadow: var(--shadow-md);
+            display: flex; align-items: center; gap: 8px;
+            font-family: var(--font-body); font-weight: 700; font-size: 0.9rem;
+            color: var(--primary); cursor: pointer; transition: var(--transition-fast);
+        }
+        .map-locate-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+        /* Custom Leaflet popup */
+        .leaflet-popup-content-wrapper { border-radius: 16px !important; padding: 0 !important; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; }
+        .leaflet-popup-content { margin: 0 !important; padding: 16px !important; }
+        .leaflet-popup-tip { background: white !important; }
+    </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- Map Filter Controls (top right) -->
+    <div style="position: absolute; top: calc(var(--nav-height) + 1rem); right: 1rem; z-index: 400; display: flex; flex-direction: column; gap: 10px;">
+        <div style="background:white; border-radius:var(--radius-lg); padding:0.8rem 1rem; box-shadow:var(--shadow-md);">
+            <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px;">Filter by Category</div>
+            <div class="filter-bar" id="map-category-filters"></div>
+        </div>
+        <div style="background:white; border-radius:var(--radius-lg); padding:0.8rem 1rem; box-shadow:var(--shadow-md);">
+            <label class="form-check" style="margin:0;">
+                <input type="checkbox" id="map-available-only">
+                <span class="form-check-label" style="font-size:0.875rem;">Available Only</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Left Panel -->
+    <div class="map-panel">
+        <div class="map-panel-header">
+            <h3>🗺️ Machine Locator</h3>
+            <p style="font-size:0.8rem; opacity:0.85;">Sri Lanka — Live Overview</p>
+        </div>
+        <div class="map-panel-body">
+            <div class="map-stat">
+                <span class="map-stat-label">Total Listed</span>
+                <span class="map-stat-value" id="stat-total">—</span>
+            </div>
+            <div class="map-stat">
+                <span class="map-stat-label">Available Now</span>
+                <span class="map-stat-value" id="stat-available" style="color: var(--success);">—</span>
+            </div>
+            <div class="map-stat">
+                <span class="map-stat-label">Unavailable</span>
+                <span class="map-stat-value" id="stat-unavailable" style="color: var(--danger);">—</span>
+            </div>
+            <div style="border-top: 1px solid #eef2f6; padding-top: 12px; margin-top: 4px;">
+                <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px;">Jump to District</div>
+                <select class="form-control" id="district-jump" style="font-size:0.875rem;">
+                    <option value="">Select District...</option>
+                </select>
+            </div>
+            <a href="farms.html" class="btn btn-primary btn-sm" style="justify-content:center;">
+                <span class="material-symbols-outlined" style="font-size:1rem;">list</span>
+                List View
+            </a>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div id="map-container"></div>
+
+    <!-- Locate Me -->
+    <button class="map-locate-btn" id="locate-btn">
+        <span class="material-symbols-outlined">my_location</span>
+        My Location
+    </button>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/map.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Init map
+        AgriLease.MapModule.initMap('map-container');
+
+        // Load stats
+        const stats = AgriLease.MapModule.getMapStats();
+        document.getElementById('stat-total').textContent = stats.total;
+        document.getElementById('stat-available').textContent = stats.available;
+        document.getElementById('stat-unavailable').textContent = stats.unavailable;
+
+        // Category filters
+        const filterBar = document.getElementById('map-category-filters');
+        filterBar.innerHTML = `<button class="filter-pill active" data-cat="">All</button>` +
+            stats.categories.map(c => `<button class="filter-pill" data-cat="${c}">${c}</button>`).join('');
+        
+        let activeCategory = '';
+        let availableOnly = false;
+
+        filterBar.addEventListener('click', e => {
+            const btn = e.target.closest('.filter-pill');
+            if (!btn) return;
+            filterBar.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeCategory = btn.dataset.cat;
+            applyMapFilters();
+        });
+
+        document.getElementById('map-available-only').addEventListener('change', function() {
+            availableOnly = this.checked;
+            applyMapFilters();
+        });
+
+        function applyMapFilters() {
+            const filters = {};
+            if (activeCategory) filters.category = activeCategory;
+            if (availableOnly) filters.available = true;
+            AgriLease.MapModule.filterMarkers(filters);
+        }
+
+        // District jump
+        const districts = {
+            'Colombo': [6.9271, 79.8612], 'Kandy': [7.2906, 80.6337],
+            'Kurunegala': [7.8731, 80.3654], 'Polonnaruwa': [7.9397, 81.0034],
+            'Anuradhapura': [8.3114, 80.4037], 'Jaffna': [9.6615, 80.0255],
+            'Galle': [6.0535, 80.2210], 'Trincomalee': [8.5874, 81.2152],
+            'Ampara': [7.2833, 81.6667], 'Gampaha': [6.9884, 79.9996],
+        };
+        const select = document.getElementById('district-jump');
+        Object.keys(districts).forEach(d => { select.innerHTML += `<option value="${d}">${d}</option>`; });
+        select.addEventListener('change', function() {
+            const coords = districts[this.value];
+            if (coords) AgriLease.MapModule.flyToDistrict(coords[0], coords[1], 11);
+        });
+
+        // Locate me
+        document.getElementById('locate-btn').addEventListener('click', async () => {
+            try {
+                const pos = await AgriLease.MapModule.getUserLocation();
+                AgriLease.MapModule.flyToDistrict(pos.lat, pos.lng, 12);
+                AgriLease.Toast.success('Showing your current location.');
+            } catch {
+                AgriLease.Toast.error('Could not get your location. Please allow location access.');
+            }
+        });
+    });
+    </script>
+</body>
+</html>
